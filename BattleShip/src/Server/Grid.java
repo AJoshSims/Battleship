@@ -1,30 +1,33 @@
 package Server;
 
 /**
- * Created by Evan on 11/6/2016.
+ * @author Evan Arroyo
+ * @author Joshua Sims
  */
+
     public class Grid {
 
-    String[][] board;
+    private char[][] board;
+
+
 
     public Grid(int height, int width){
 
-        board = new String[height][width];
+        board = new char[height][width];
 
     }
 
     public void createBoard(){
 
-        for (int i = 0; i < board.length;i++){
+        for(int i = 0; i < board.length; i++) {
 
-            for (int j = 0; j < board.length;j++){
+            for(int j = 0; j < board[0].length; j++) {
 
-                board[i][j] = "|__";
+                board[i][j] = 'O';
 
-                System.out.print(board[i][j] + "|");
             }
 
-            System.out.println();
         }
+
     }
 }
