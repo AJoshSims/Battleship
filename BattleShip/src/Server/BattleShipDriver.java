@@ -69,8 +69,12 @@ public class BattleShipDriver {
         g.attack(row, col);
         g.print();
 
+        //Player 5 Board With No Ships
+        g.createBoard();
+        g.print();
+
     }
     private static void UsageMessage(){
-        System.out.println("Usage: <port> <boardSize>");
+        System.out.println("Usage: <port> <boardSize> <attackRow> <attackColumn>");
     }
 }

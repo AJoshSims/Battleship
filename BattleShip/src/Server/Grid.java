@@ -7,7 +7,7 @@ package Server;
 
     public class Grid {
 
-    private char[][] board;
+    public static char[][] board;
 
 
 
@@ -17,7 +17,7 @@ package Server;
 
     }
 
-    public void createBoard(){
+    public void createGrid(){
 
         for(int i = 0; i < board.length; i++) {
 

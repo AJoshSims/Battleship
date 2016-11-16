@@ -5,13 +5,13 @@ package Server;
  * @author Joshua Sims
  */
 
-public class Game {
+public class Game{
 
     private static int[] shipLengths = {2, 4, 5, 5, 6};
 
     private static char[][] board;
 
-    public Grid g;
+
 
     public Game(int height, int width){
 
@@ -30,12 +30,15 @@ public class Game {
         }
 
     }
+
 /**
     public void createBoard(){
 
-        g.createBoard();
+
+
 
     }
+
 **/
 
 
@@ -144,7 +147,9 @@ public class Game {
             }
 
             System.out.println("");
+
         }
+        System.out.println("\n");
     }
 }
 
