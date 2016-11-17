@@ -28,89 +28,117 @@ class Grid
 		finalRow = boardSize - OFFSET;
 		finalColumn = boardSize - OFFSET;
 		board = new Ship[boardSize][boardSize];
-		populateBoardWithEmptySpaces();
+		createBoard();
 	}
 	
-	void populateBoard()
+	void placeShips()
 	{	
-		int rowToPopulate = -1;
-		int columnToPopulate = -1;
+		int row = -1;
+		int column = -1;
+		boolean populateRow = true;
+		
 		int shipLength = -1;
+		int[] shipSegments = null;
 		for (Ship ship : Ship.values())
 		{
-			shipLength = ship.getLength();
 			if (ship == Ship.NONE)
 			{
 				break;
 			}
 			
-			rowToPopulate = RANDOM_VAL_GENERATOR.nextInt(boardSize);
-			columnToPopulate = RANDOM_VAL_GENERATOR.nextInt(boardSize);
 			
-			boolean populateRow = RANDOM_VAL_GENERATOR.nextBoolean();
-			
-			if (populateRow)
-			{	
-				if (columnToPopulate < finalRow - shipLength)
-				{
-					// Populate forward
-					for (
-						int segmentsToBuild = shipLength; 
-						segmentsToBuild > NONE;
-						--segmentsToBuild)
-					{
-						board[rowToPopulate][columnToPopulate] = ship;
-						++columnToPopulate;
-					}
-				}
-				
-				else if (columnToPopulate >= shipLength - OFFSET)
-				{
-					// Populate backward
-					for (
-						int segmentsToBuild = shipLength; 
-						segmentsToBuild > NONE;
-						--segmentsToBuild)
-					{
-						board[rowToPopulate][columnToPopulate] = ship;
-						--columnToPopulate;
-					}
-				}
-			}
-			
-			else
+			shipLength = ship.getLength();
+						
+			do
 			{
-				if (rowToPopulate < finalColumn - shipLength)
-				{
-					// Populate forward
-					for (
-						int segmentsToBuild = shipLength; 
-						segmentsToBuild > NONE;
-						--segmentsToBuild)
-					{
-						board[rowToPopulate][columnToPopulate] = ship;
-						++rowToPopulate;
-					}
-				}
+				row = RANDOM_VAL_GENERATOR.nextInt(boardSize);
+				column = RANDOM_VAL_GENERATOR.nextInt(boardSize);
 				
-				else if (rowToPopulate >= shipLength - OFFSET)
+				populateRow = RANDOM_VAL_GENERATOR.nextBoolean();
+				
+				shipSegments = buildShip(
+					shipLength, row, column, populateRow);
+				
+			}
+			// Ship was not built so try again.
+			while (shipSegments[] != shipLength);
+			
+			for (int segment : shipSegments)
+			{
+				if (populateRow)
 				{
-					// Populate backward
-					for (
-						int segmentsToBuild = shipLength; 
-						segmentsToBuild > NONE;
-						--segmentsToBuild)
-					{
-						board[rowToPopulate][columnToPopulate] = ship;
-						--rowToPopulate;
-					}
+					board[row][segment] = ship;
+				}
+				else
+				{
+					board[segment][column] = ship;
 				}
 			}
-			
 		}
 	}
 	
-	void populateBoardWithEmptySpaces()
+	private int[] buildShip(
+		int shipLength, int rowInitial, int columnInitial, boolean populateRow)
+	{
+		int[] shipSegments = new int[shipLength];
+		
+		int row = rowInitial;
+		int column = columnInitial;
+		
+		for (
+			int shipSegment = 0; 
+			shipSegment < shipLength
+			&& board[row][column] == Ship.NONE;
+			++shipSegment)
+		{	
+			if (populateRow)
+			{
+				shipSegments[shipSegment] = column;
+				
+				if (columnInitial < boardSize - shipLength)
+				{
+					// Will populate forward on row.
+					++column;
+				}
+				
+				else if (columnInitial >= shipLength - OFFSET)
+				{
+					// Will populate backward on row.
+					--column;
+				}
+				
+				else
+				{
+					break;
+				}
+			}
+			else
+			{
+				shipSegments[shipSegment] = row;
+				
+				if (rowInitial < boardSize - shipLength)
+				{
+					// Will populate forward on column.
+					++row;
+				}
+				
+				else if (rowInitial >= shipLength - OFFSET)
+				{
+					// Will populate backward on column.
+					--row;
+				}
+				
+				else
+				{
+					break;
+				}
+			}
+		}
+		
+		return shipSegments;
+	}
+	
+	void createBoard()
 	{
 		for (int row = 0; row < boardSize; ++row)
 		{
