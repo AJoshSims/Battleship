@@ -7,9 +7,9 @@ public class BattleShipDriver
 {
 	public static void main(String[] args)
 	{
-		Grid grid = new Grid(10);
+		Grid grid = new Grid(5);
 		
-		grid.populateBoard();
+		grid.placeShips();
 		
 		System.out.print(grid.getBoardString());
 	}
