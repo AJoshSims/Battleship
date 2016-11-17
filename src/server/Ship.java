@@ -23,4 +23,9 @@ enum Ship
 	{
 		return abbreviation;
 	}
+	
+	int getLength()
+	{
+		return length;
+	}
 }

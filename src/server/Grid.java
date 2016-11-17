@@ -16,37 +16,97 @@ class Grid
 	
 	private final int finalColumn;
 	
-	private static final Random RANDOM_NUM_GENERATOR = new Random();
+	private static final Random RANDOM_VAL_GENERATOR = new Random();
+	
+	private static final int NONE = 0;
+	
+	private static final int OFFSET = 1;
 	
 	Grid(int boardSize)
 	{
 		this.boardSize = boardSize;
-		finalRow = boardSize - 1;
-		finalColumn = boardSize - 1;
+		finalRow = boardSize - OFFSET;
+		finalColumn = boardSize - OFFSET;
 		board = new Ship[boardSize][boardSize];
+		populateBoardWithEmptySpaces();
 	}
 	
 	void populateBoard()
 	{	
 		int rowToPopulate = -1;
 		int columnToPopulate = -1;
+		int shipLength = -1;
 		for (Ship ship : Ship.values())
 		{
+			shipLength = ship.getLength();
 			if (ship == Ship.NONE)
 			{
 				break;
 			}
 			
-			rowToPopulate = RANDOM_NUM_GENERATOR.nextInt(boardSize);
-			columnToPopulate = RANDOM_NUM_GENERATOR.nextInt(boardSize);
+			rowToPopulate = RANDOM_VAL_GENERATOR.nextInt(boardSize);
+			columnToPopulate = RANDOM_VAL_GENERATOR.nextInt(boardSize);
 			
-			for (int row = 0; row < boardSize; ++row)
-			{
-				for (int column = 0; column < boardSize; ++column)
+			boolean populateRow = RANDOM_VAL_GENERATOR.nextBoolean();
+			
+			if (populateRow)
+			{	
+				if (columnToPopulate < finalRow - shipLength)
 				{
-					
+					// Populate forward
+					for (
+						int segmentsToBuild = shipLength; 
+						segmentsToBuild > NONE;
+						--segmentsToBuild)
+					{
+						board[rowToPopulate][columnToPopulate] = ship;
+						++columnToPopulate;
+					}
+				}
+				
+				else if (columnToPopulate >= shipLength - OFFSET)
+				{
+					// Populate backward
+					for (
+						int segmentsToBuild = shipLength; 
+						segmentsToBuild > NONE;
+						--segmentsToBuild)
+					{
+						board[rowToPopulate][columnToPopulate] = ship;
+						--columnToPopulate;
+					}
 				}
 			}
+			
+			else
+			{
+				if (rowToPopulate < finalColumn - shipLength)
+				{
+					// Populate forward
+					for (
+						int segmentsToBuild = shipLength; 
+						segmentsToBuild > NONE;
+						--segmentsToBuild)
+					{
+						board[rowToPopulate][columnToPopulate] = ship;
+						++rowToPopulate;
+					}
+				}
+				
+				else if (rowToPopulate >= shipLength - OFFSET)
+				{
+					// Populate backward
+					for (
+						int segmentsToBuild = shipLength; 
+						segmentsToBuild > NONE;
+						--segmentsToBuild)
+					{
+						board[rowToPopulate][columnToPopulate] = ship;
+						--rowToPopulate;
+					}
+				}
+			}
+			
 		}
 	}
 	
@@ -74,7 +134,8 @@ class Grid
 			boardStringBuilder.append(row + " ");
 			for (int column = 0; column < boardSize; ++column)
 			{
-				boardStringBuilder.append("| " + board[row][column].getAbbreviation() + " ");
+				boardStringBuilder.append(
+					"| " + board[row][column].getAbbreviation() + " ");
 			}
 			boardStringBuilder.append("|\n" + rowDelimiter);
 		}
