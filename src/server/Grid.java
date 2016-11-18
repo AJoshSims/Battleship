@@ -3,34 +3,36 @@ package server;
 import utilities.Constants;
 import utilities.MutableInteger;
 
+// TODO make boardSize static
+
 class Grid
 {
+	private final int boardSize;
+	
 	private Tile[][] board;
 	
-	private final int boardSize;
-						
-	Grid(int boardSize, boolean ownership)
+	private final String username;
+	
+	Grid(int boardSize, String username)
 	{
 		this.boardSize = boardSize;
 		board = new Tile[boardSize][boardSize];
-		createBoard(ownership);
+		this.username = username;
+		createBoard();
 	}
 	
-	void createBoard(boolean ownership)
+	void createBoard()
 	{
 		for (int row = 0; row < boardSize; ++row)
 		{
 			for (int column = 0; column < boardSize; ++column)
 			{
-				board[row][column] = new Tile(
-					row, column, 
-					ownership, 
-					ShipSegment.NONE);
+				board[row][column] = new Tile(row, column, ShipSegment.NONE);
 			}
 		}
 	}
 	
-	void placeShips(boolean ownership)
+	void placeShips()
 	{	
 		int shipLength = -1;
 		Tile[] shipSegmentTiles = null;
@@ -45,7 +47,7 @@ class Grid
 			
 			do
 			{
-				shipSegmentTiles = buildShip(ship, shipLength, ownership);
+				shipSegmentTiles = buildShip(ship, shipLength);
 			}
 			while (shipSegmentTiles == null);
 			
@@ -58,8 +60,7 @@ class Grid
 	}
 	
 	private Tile[] buildShip(
-		ShipSegment shipSegment, int shipLength, 
-		boolean ownership)
+		ShipSegment shipSegment, int shipLength)
 	{
 		Tile[] shipSegmentTiles = new Tile[shipLength];
 		
@@ -114,7 +115,7 @@ class Grid
 			}
 			
 			shipSegmentTiles[currentShipSegmentTileIndex] = new Tile(
-				row.value, column.value, ownership, shipSegment);
+				row.value, column.value, shipSegment);
 			
 			if (buildForward == true)
 			{
@@ -130,7 +131,7 @@ class Grid
 		return shipSegmentTiles;
 	}
 	
-	String getBoardString()
+	String getBoardString(String username)
 	{
 		StringBuilder boardStringBuilder = new StringBuilder();
 		
@@ -159,7 +160,7 @@ class Grid
 			for (int column = 0; column < boardSize; ++column)
 			{
 				boardStringBuilder.append(
-					"| " + board[row][column].getTileText() + " ");
+					"| " + board[row][column].getTileText(username) + " ");
 			}
 			boardStringBuilder.append("|\n" + rowDelimiter);
 		}
@@ -173,35 +174,22 @@ class Grid
 		private final int row;
 		
 		private final int column;
-		
-		private boolean ownership;
-		
+				
 		private final ShipSegment shipSegment;
 		
 		private boolean hit;
 		
 		private TileText tileText;
 		
-		private Tile(
-			int row, int column, 
-			boolean ownership, 
-			ShipSegment shipSegment)
+		private Tile(int row, int column, ShipSegment shipSegment)
 		{
 			this.row = row;
 			this.column = column;
-			this.ownership = ownership;
 			
 			this.shipSegment = shipSegment;
 			hit = false;
 			
-			if (ownership == true)
-			{
-				tileText = shipSegment.getTileText();	
-			}
-			else
-			{
-				tileText = TileText.NONE_OR_UNKNOWN;
-			}
+			tileText = shipSegment.getTileText();
 		}
 		
 		private int getRow()
@@ -214,14 +202,20 @@ class Grid
 			return column;
 		}
 		
-		private char getTileText()
+		private char getTileText(String username)
 		{
+			if (
+				(username != Grid.this.username)
+				&& ((tileText == TileText.CARRIER)
+				|| (tileText == TileText.BATTLESHIP)
+				|| (tileText == TileText.CRUISER)
+				|| (tileText == TileText.SUBMARINE)
+				|| (tileText == TileText.DESTROYER)))
+			{
+				return TileText.NONE_OR_UNKNOWN.getTileText();
+			}
+			
 			return tileText.getTileText();
-		}
-		
-		private ShipSegment getShipSegment()
-		{
-			return shipSegment;
 		}
 		
 		private boolean isHit()

@@ -6,13 +6,13 @@ package server;
 public class BattleShipDriver
 {
 	public static void main(String[] args)
-	{
-		boolean ownership = true;
+	{		
+		String username = "Joshua";
 		
-		Grid grid = new Grid(5, ownership);
+		Grid grid = new Grid(5, username);
 		
-		grid.placeShips(ownership);
+		grid.placeShips();
 		
-		System.out.print(grid.getBoardString());
+		System.out.print(grid.getBoardString("Bill"));
 	}
 }
