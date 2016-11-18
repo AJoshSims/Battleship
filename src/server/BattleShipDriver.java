@@ -7,9 +7,11 @@ public class BattleShipDriver
 {
 	public static void main(String[] args)
 	{
-		Grid grid = new Grid(5);
+		boolean ownership = true;
 		
-		grid.placeShips();
+		Grid grid = new Grid(5, ownership);
+		
+		grid.placeShips(ownership);
 		
 		System.out.print(grid.getBoardString());
 	}

@@ -1,55 +1,39 @@
 package server;
 
-import java.util.Random;
-
-import server.Tile.ShipSegment;
+import utilities.Constants;
+import utilities.MutableInteger;
 
 class Grid
 {
 	private Tile[][] board;
 	
 	private final int boardSize;
-	
-	private static final int FIRST_ROW = 0;
-	
-	private final int finalRow;
-	
-	private static final int FIRST_COLUMN = 0;
-	
-	private final int finalColumn;
-	
-	private static final Random RANDOM_VAL_GENERATOR = new Random();
-	
-	private static final int NONE = 0;
-	
-	private static final int OFFSET = 1;
-	
+						
 	Grid(int boardSize, boolean ownership)
 	{
 		this.boardSize = boardSize;
-		finalRow = boardSize - OFFSET;
-		finalColumn = boardSize - OFFSET;
 		board = new Tile[boardSize][boardSize];
 		createBoard(ownership);
 	}
 	
 	void createBoard(boolean ownership)
 	{
-		Tile vacantTile = null;
 		for (int row = 0; row < boardSize; ++row)
 		{
 			for (int column = 0; column < boardSize; ++column)
 			{
-				board[row][column] = new Tile(row, column, ownership);
+				board[row][column] = new Tile(
+					row, column, 
+					ownership, 
+					ShipSegment.NONE);
 			}
 		}
 	}
 	
-	void placeShips()
+	void placeShips(boolean ownership)
 	{	
 		int shipLength = -1;
-		ShipSegment[] shipSegments = null;
-		int lastSegment = -1;
+		Tile[] shipSegmentTiles = null;
 		for (ShipSegment ship : ShipSegment.values())
 		{
 			if (ship == ShipSegment.NONE)
@@ -58,90 +42,92 @@ class Grid
 			}
 			
 			shipLength = ship.getLengthOfWhole();
-			lastSegment = shipLength - 1;
 			
 			do
 			{
-				shipSegments = buildShip(ship, shipLength);
+				shipSegmentTiles = buildShip(ship, shipLength, ownership);
 			}
-			while (shipSegments[lastSegment] == null);
+			while (shipSegmentTiles == null);
+			
+			for (Tile shipSegmentTile : shipSegmentTiles)
+			{
+				board[shipSegmentTile.getRow()][shipSegmentTile.getColumn()] =
+					shipSegmentTile;
+			}
 		}
 	}
 	
-	ShipSegment[] buildShip(ShipSegment ship, int shipLength)
+	private Tile[] buildShip(
+		ShipSegment shipSegment, int shipLength, 
+		boolean ownership)
 	{
-		ShipSegment[] shipSegments = new ShipSegment[shipLength];
+		Tile[] shipSegmentTiles = new Tile[shipLength];
 		
-		for ()
+		MutableInteger row = new MutableInteger();
+		MutableInteger column = new MutableInteger();
+		MutableInteger currentStepAlongPath = null;
+		
+		final int maxEdge = boardSize - 1;
+		final int minEdge = 0;
+		final int requiredDistanceFromEdge = shipLength - 1;
+
+		row.value = Constants.RANDOM_VAL_GENERATOR.nextInt(boardSize);
+		column.value = Constants.RANDOM_VAL_GENERATOR.nextInt(boardSize);
+		
+		boolean buildAlongRow = Constants.RANDOM_VAL_GENERATOR.nextBoolean();
+		
+		if (buildAlongRow == true)
 		{
-			
+			currentStepAlongPath = column;
+		}
+		else
+		{
+			currentStepAlongPath = row;
 		}
 		
-//		int rowToPopulate = -1;
-//		int columnToPopulate = -1;
-//		
-//		rowToPopulate = RANDOM_VAL_GENERATOR.nextInt(boardSize);
-//		columnToPopulate = RANDOM_VAL_GENERATOR.nextInt(boardSize);
-//		
-//		boolean populateRow = RANDOM_VAL_GENERATOR.nextBoolean();
-//		
-//		if (populateRow)
-//		{	
-//			if (columnToPopulate <= boardSize - shipLength)
-//			{
-//				// Populate forward
-//				for (
-//					int segmentsToBuild = shipLength; 
-//					segmentsToBuild > NONE;
-//					--segmentsToBuild)
-//				{
-//					board[rowToPopulate][columnToPopulate] = ship;
-//					++columnToPopulate;
-//				}
-//			}
-//			
-//			else if (columnToPopulate >= shipLength - OFFSET)
-//			{
-//				// Populate backward
-//				for (
-//					int segmentsToBuild = shipLength; 
-//					segmentsToBuild > NONE;
-//					--segmentsToBuild)
-//				{
-//					board[rowToPopulate][columnToPopulate] = ship;
-//					--columnToPopulate;
-//				}
-//			}
-//		}
-//		
-//		else
-//		{
-//			if (rowToPopulate <= boardSize - shipLength)
-//			{
-//				// Populate forward
-//				for (
-//					int segmentsToBuild = shipLength; 
-//					segmentsToBuild > NONE;
-//					--segmentsToBuild)
-//				{
-//					board[rowToPopulate][columnToPopulate] = ship;
-//					++rowToPopulate;
-//				}
-//			}
-//			
-//			else if (rowToPopulate >= shipLength - OFFSET)
-//			{
-//				// Populate backward
-//				for (
-//					int segmentsToBuild = shipLength; 
-//					segmentsToBuild > NONE;
-//					--segmentsToBuild)
-//				{
-//					board[rowToPopulate][columnToPopulate] = ship;
-//					--rowToPopulate;
-//				}
-//			}
-//		}
+		boolean buildForward = false;
+		if (currentStepAlongPath.value <= 
+			(maxEdge - requiredDistanceFromEdge))
+		{
+			buildForward = true;
+		}
+		else if (currentStepAlongPath.value >= 
+			(requiredDistanceFromEdge - minEdge))
+		{
+			buildForward = false;
+		}
+		else 
+		{
+			return null;
+		}
+		
+		for (
+			int currentShipSegmentTileIndex = 0; 
+			currentShipSegmentTileIndex < shipLength; 
+			++currentShipSegmentTileIndex)
+		{
+			if ((row.value >= boardSize) || (column.value >= boardSize)
+				|| (board[row.value][column.value].shipSegment != 
+				ShipSegment.NONE))
+			{
+				return null;
+			}
+			
+			shipSegmentTiles[currentShipSegmentTileIndex] = new Tile(
+				row.value, column.value, ownership, shipSegment);
+			
+			if (buildForward == true)
+			{
+				++currentStepAlongPath.value;
+			}
+			
+			else
+			{
+				--currentStepAlongPath.value;
+			}
+		}
+		
+		return shipSegmentTiles;
 	}
 	
 	String getBoardString()
@@ -196,15 +182,26 @@ class Grid
 		
 		private TileText tileText;
 		
-		private Tile(int row, int column, boolean ownership)
+		private Tile(
+			int row, int column, 
+			boolean ownership, 
+			ShipSegment shipSegment)
 		{
 			this.row = row;
 			this.column = column;
 			this.ownership = ownership;
 			
-			shipSegment = ShipSegment.NONE;
+			this.shipSegment = shipSegment;
 			hit = false;
-			tileText = shipSegment.getTileText();
+			
+			if (ownership == true)
+			{
+				tileText = shipSegment.getTileText();	
+			}
+			else
+			{
+				tileText = TileText.NONE_OR_UNKNOWN;
+			}
 		}
 		
 		private int getRow()
@@ -227,18 +224,12 @@ class Grid
 			return shipSegment;
 		}
 		
-		private void setShipSegment(ShipSegment shipSegment)
-		{
-			this.shipSegment = shipSegment;
-			tileText = shipSegment.getTileText();
-		}
-		
 		private boolean isHit()
 		{
 			return hit;
 		}
 		
-		private boolean hit()
+		private void hit()
 		{
 			if (shipSegment != ShipSegment.NONE)
 			{
@@ -256,7 +247,7 @@ class Grid
 
 enum ShipSegment
 {
-	CARRIER (TileText.SUBMARINE, 5),
+	CARRIER (TileText.CARRIER, 5),
 	BATTLESHIP (TileText.BATTLESHIP, 4),
 	CRUISER (TileText.CRUISER, 3),
 	SUBMARINE (TileText.SUBMARINE, 3),
