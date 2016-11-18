@@ -37,26 +37,33 @@ public class BattleShipDriver
 		
 		Scanner userInput = new Scanner(System.in);
 		
-		System.out.println("Evan, please attack Joshua...");
-		System.out.print("Specify a row to attack: ");
-		int rowJoshua = userInput.nextInt();
-		System.out.print("Specify a column to attack: ");
-		int columnJoshua = userInput.nextInt();
-		System.out.println("attacking...");
-		game.attack(Joshua, rowJoshua, columnJoshua);
-		System.out.print(
-			"Joshua's grid viewed by Evan\n" + 
-			grids.get(Joshua).getBoardString(Evan) + "\n");
-		
-		System.out.println("Joshua, please attack Evan...");
-		System.out.print("Specify a row to attack: ");
-		int rowEvan = userInput.nextInt();
-		System.out.print("Specify a column to attack: ");
-		int columnEvan = userInput.nextInt();
-		System.out.println("attacking...");
-		game.attack(Evan, rowEvan, columnEvan);
-		System.out.print(
-			"Evan's grid viewed by Joshua\n" + 
-			grids.get(Evan).getBoardString(Joshua) + "\n");
+		do
+		{
+			System.out.println("Evan, please attack Joshua...");
+			System.out.print("Specify a row to attack: ");
+			int rowJoshua = userInput.nextInt();
+			System.out.print("Specify a column to attack: ");
+			int columnJoshua = userInput.nextInt();
+			System.out.println("attacking...");
+			game.attack(Joshua, rowJoshua, columnJoshua);
+			System.out.print(
+				"Joshua's grid viewed by Evan\n" + 
+				grids.get(Joshua).getBoardString(Evan) + "\n");
+			
+			System.out.println("Joshua, please attack Evan...");
+			System.out.print("Specify a row to attack: ");
+			int rowEvan = userInput.nextInt();
+			System.out.print("Specify a column to attack: ");
+			int columnEvan = userInput.nextInt();
+			System.out.println("attacking...");
+			game.attack(Evan, rowEvan, columnEvan);
+			System.out.print(
+				"Evan's grid viewed by Joshua\n" + 
+				grids.get(Evan).getBoardString(Joshua) + "\n");
+			
+			System.out.print(
+				"Enter \"q\" to quit or anything else to continue: ");
+		}
+		while (!userInput.next().equals("q"));
 	}
 }
