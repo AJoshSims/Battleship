@@ -7,18 +7,22 @@ import utilities.MutableInteger;
 
 class Grid
 {
-	private final int boardSize;
+	static int boardSize = 10;
 	
 	private Tile[][] board;
 	
 	private final String username;
 	
-	Grid(int boardSize, String username)
+	Grid(String username)
 	{
-		this.boardSize = boardSize;
 		board = new Tile[boardSize][boardSize];
 		this.username = username;
 		createBoard();
+	}
+	
+	Tile[][] getBoard()
+	{
+		return board;
 	}
 	
 	void createBoard()
@@ -53,7 +57,7 @@ class Grid
 			
 			for (Tile shipSegmentTile : shipSegmentTiles)
 			{
-				board[shipSegmentTile.getRow()][shipSegmentTile.getColumn()] =
+				board[shipSegmentTile.row][shipSegmentTile.column] =
 					shipSegmentTile;
 			}
 		}
@@ -169,7 +173,7 @@ class Grid
 		return boardString;
 	}
 	
-	private final class Tile
+	final class Tile
 	{		
 		private final int row;
 		
@@ -192,16 +196,6 @@ class Grid
 			tileText = shipSegment.getTileText();
 		}
 		
-		private int getRow()
-		{
-			return row;
-		}
-		
-		private int getColumn()
-		{
-			return column;
-		}
-		
 		private char getTileText(String username)
 		{
 			if (
@@ -218,12 +212,7 @@ class Grid
 			return tileText.getTileText();
 		}
 		
-		private boolean isHit()
-		{
-			return hit;
-		}
-		
-		private void hit()
+		void shoot()
 		{
 			if (shipSegment != ShipSegment.NONE)
 			{
