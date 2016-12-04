@@ -1,5 +1,7 @@
 package server;
 
+import java.io.IOException;
+
 public class BattleShipDriver
 {	
 	public static void main(String[] args)
@@ -10,7 +12,18 @@ public class BattleShipDriver
 		int portNum = Integer.parseInt(args[0]);
 		int boardSize = Integer.parseInt(args[1]);
 		
-		BattleServer battleServer = new BattleServer();
-		battleServer.listen(portNum);
+		// TODO error handling
+		BattleServer battleServer = null;
+		try
+		{
+			battleServer = new BattleServer(portNum);
+			battleServer.listen(portNum);
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+		
+		
 	}
 }

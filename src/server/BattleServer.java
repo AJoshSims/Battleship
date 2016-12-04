@@ -1,8 +1,13 @@
 package server;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 
 import common.ConnectionInterface;
 
@@ -15,10 +20,13 @@ public class BattleServer implements MessageListener
 {
 	ServerSocket welcomeSocket;
 	
+	ArrayList<ConnectionInterface> clients;
+	
 	// TODO error handling
 	BattleServer(int portNum) throws IOException
 	{
 		welcomeSocket = new ServerSocket(portNum);
+		clients = new ArrayList<ConnectionInterface>();
 	}
 	
 	@Override
@@ -44,6 +52,8 @@ public class BattleServer implements MessageListener
 			
 			ConnectionInterface client = 
 				new ConnectionInterface(clientSpecificSocket);
+			clients.add(client);
+//			client.addMessageListener(this);
 			Thread clientThread = new Thread(client);
 			clientThread.start();
 		}
