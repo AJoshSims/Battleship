@@ -15,6 +15,7 @@ public interface MessageListener
 	* @param source The source from which this message originated (if needed).
 	*/
 	public void messageReceived(String message, MessageSource source);
+	
 	/**
 	* Used to notify observers that the subject will not receive new messages; observers can
 	* deregister themselves.
