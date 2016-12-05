@@ -22,7 +22,7 @@ public class BattleServer implements MessageListener
 	HashMap<String, ConnectionInterface> connectionInterfaces;
 	
 	// TODO error handling
-	BattleServer(int port) throws IOException
+	BattleServer(int port, int boardSize) throws IOException
 	{
 		welcomeSocket = new ServerSocket(port);
 		connectionInterfaces = new HashMap<String, ConnectionInterface>(); 

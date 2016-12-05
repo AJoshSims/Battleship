@@ -3,7 +3,6 @@ package common;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.Socket;
 
 public class ConnectionInterface extends MessageSource implements Runnable
 {
@@ -40,5 +39,6 @@ public class ConnectionInterface extends MessageSource implements Runnable
 	public void sendMessage(String message)
 	{
 		socketOutput.print(message);
+		run();
 	}
 }
