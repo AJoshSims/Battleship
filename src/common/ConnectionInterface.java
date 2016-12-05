@@ -10,6 +10,8 @@ public class ConnectionInterface extends MessageSource implements Runnable
 
 	private BufferedReader socketInput;
 	
+	private String username;
+	
 	public ConnectionInterface(
 		PrintWriter socketOutput, BufferedReader socketInput)
 	{
@@ -17,28 +19,44 @@ public class ConnectionInterface extends MessageSource implements Runnable
 		this.socketInput = socketInput;
 	}
 	
+	public String getUsername()
+	{
+		return username;
+	}
+	
+	public void setUsername(String username)
+	{
+		this.username = username;
+	}
+	
 	public void run()
 	{
-		// TODO error handling
-		String message = null;
-		while (message == null)
+		// TODO no forever loop
+		while (true)
 		{
-			try
+			// TODO error handling
+			String message = "";
+			String messageSegment = "";
+			while (!messageSegment.equals("end"))
 			{
-				message = socketInput.readLine();
+				try
+				{			
+					messageSegment = socketInput.readLine();
+					message += messageSegment + "\n";
+				}
+				catch (IOException e)
+				{
+					// Try again.
+				}
 			}
-			catch (IOException e)
-			{
-				message = null;
-			}
+			
+			notifyReceipt(message);
 		}
-		
-		notifyReceipt(message);
 	}
 	
 	public void sendMessage(String message)
 	{
-		socketOutput.print(message);
-		run();
+		socketOutput.print(message + "\nend\n");
+		socketOutput.flush();
 	}
 }

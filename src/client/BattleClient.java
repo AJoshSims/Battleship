@@ -11,36 +11,41 @@ import common.ConnectionInterface;
 import common.MessageListener;
 import common.MessageSource;
 
+// TODO use string builder
+
 public class BattleClient extends MessageSource implements MessageListener
-{
-	private Socket clientSpecificSocket;
+{	
 	private ConnectionInterface connectionInterface;
-	
-	String username;
-	
+			
 	// TODO error handling
 	BattleClient(InetAddress host, int port, String username)
 		throws IOException
-	{
-		clientSpecificSocket = new Socket(host, port);
+	{				
+		// TODO close socket?
+		Socket clientSpecificSocket = new Socket(host, port);
 		PrintWriter socketOutput = 
 			new PrintWriter(clientSpecificSocket.getOutputStream());
 		BufferedReader socketInput = 
 			new BufferedReader(
 			new InputStreamReader(clientSpecificSocket.getInputStream()));
 		
+		// TODO run connectionInterface as thread for client?
 		connectionInterface = 
 			new ConnectionInterface(socketOutput, socketInput);
 		connectionInterface.addMessageListener(this);
-		connectionInterface.run();
+		Thread thread = new Thread(connectionInterface);
+		thread.start();
 		
-		this.username = username;
+		// TODO error handling for already taken username
+		// TODO change
+		connectionInterface.sendMessage("");
 	}
 	
 	@Override
 	public void messageReceived(String message, MessageSource source)
 	{
-		System.out.println(message);
+		System.out.print(message);
+		System.out.flush();
 	}
 
 	@Override
@@ -51,6 +56,6 @@ public class BattleClient extends MessageSource implements MessageListener
 	
 	void sendMessage(String message)
 	{
-		connectionInterface.sendMessage(username + " " + message);
+		connectionInterface.sendMessage(message);
 	}
 }

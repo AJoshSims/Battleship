@@ -18,27 +18,24 @@ import common.MessageSource;
 public class BattleServer implements MessageListener
 {
 	ServerSocket welcomeSocket;
-	
-	HashMap<String, ConnectionInterface> connectionInterfaces;
-	
+		
 	// TODO error handling
 	BattleServer(int port, int boardSize) throws IOException
 	{
 		welcomeSocket = new ServerSocket(port);
-		connectionInterfaces = new HashMap<String, ConnectionInterface>(); 
 	}
 	
 	@Override
 	public void messageReceived(String message, MessageSource source)
 	{
-		String[] messageSegments = message.split(" ");
-		String username = messageSegments[0];
-		String command = messageSegments[1];
-		
-		ConnectionInterface connectionInterface = 
-			connectionInterfaces.get(username);
 		// TODO change
-		connectionInterface.sendMessage("server has received your message.");
+		if (source instanceof ConnectionInterface)
+		{
+			ConnectionInterface connectionInterface = 
+				(ConnectionInterface) source;
+						
+			connectionInterface.sendMessage("thxclient");
+		}
 	}
 
 	@Override
@@ -54,7 +51,12 @@ public class BattleServer implements MessageListener
 		// TODO no forever loop
 		while (true)
 		{
+			// TODO remove
+			System.out.println("server: before acceptance");
+			
 			clientSpecificSocket = welcomeSocket.accept();
+
+			System.out.println("server: after acceptance");
 			
 			PrintWriter socketOutput = 
 				new PrintWriter(clientSpecificSocket.getOutputStream());
@@ -62,15 +64,21 @@ public class BattleServer implements MessageListener
 				new BufferedReader(
 				new InputStreamReader(clientSpecificSocket.getInputStream()));
 			
+			System.out.println("server: after createwriter and reader");
+			
 			ConnectionInterface connectionInterface = 
 				new ConnectionInterface(socketOutput, socketInput);
-			connectionInterface.addMessageListener(this);
-			// TODO make more readable
-			String username = socketInput.readLine().split(" ")[0];
-			connectionInterfaces.put(username, connectionInterface);
 			
+			System.out.println("server: after create connectionInterface");
+
+			connectionInterface.addMessageListener(this);
+			
+			System.out.println("server: after addMessageListener");
+									
 			Thread clientThread = new Thread(connectionInterface);
 			clientThread.start();
+			
+			System.out.println("server: after connectionInterface thread started");
 		}
 	}
 }
