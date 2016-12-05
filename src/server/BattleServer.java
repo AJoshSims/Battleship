@@ -19,14 +19,11 @@ import common.MessageSource;
 public class BattleServer implements MessageListener
 {
 	ServerSocket welcomeSocket;
-	
-	ArrayList<ConnectionInterface> clients;
-	
+		
 	// TODO error handling
 	BattleServer(int portNum) throws IOException
 	{
 		welcomeSocket = new ServerSocket(portNum);
-		clients = new ArrayList<ConnectionInterface>();
 	}
 	
 	@Override
@@ -50,10 +47,9 @@ public class BattleServer implements MessageListener
 		{
 			clientSpecificSocket = welcomeSocket.accept();
 			
-			ConnectionInterface client = 
+			ConnectionInterface client =
 				new ConnectionInterface(clientSpecificSocket);
-			clients.add(client);
-//			client.addMessageListener(this);
+			client.addMessageListener(this);
 			Thread clientThread = new Thread(client);
 			clientThread.start();
 		}
