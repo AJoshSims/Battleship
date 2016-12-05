@@ -7,15 +7,15 @@ import java.net.Socket;
 
 public class ConnectionInterface extends MessageSource implements Runnable
 {
-	private Socket socket;
-
 	private PrintWriter socketOutput;
 
 	private BufferedReader socketInput;
 	
-	public ConnectionInterface(Socket socket)
+	public ConnectionInterface(
+		PrintWriter socketOutput, BufferedReader socketInput)
 	{
-		this.socket = socket;
+		this.socketOutput = socketOutput;
+		this.socketInput = socketInput;
 	}
 	
 	public void run()
@@ -35,5 +35,10 @@ public class ConnectionInterface extends MessageSource implements Runnable
 		}
 		
 		notifyReceipt(message);
+	}
+	
+	public void sendMessage(String message)
+	{
+		socketOutput.print(message);
 	}
 }

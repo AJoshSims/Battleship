@@ -10,7 +10,9 @@ import common.MessageSource;
 
 public class BattleClient extends MessageSource implements MessageListener
 {
-	ConnectionInterface connectionInterface;
+	private ConnectionInterface connectionInterface;
+	
+	String username;
 	
 	// TODO error handling
 	BattleClient(InetAddress host, int port, String username)
@@ -19,22 +21,24 @@ public class BattleClient extends MessageSource implements MessageListener
 		connectionInterface = new ConnectionInterface(new Socket(host, port));
 		connectionInterface.addMessageListener(this);
 		connectionInterface.run();
+		
+		this.username = username;
 	}
 	
 	@Override
 	public void messageReceived(String message, MessageSource source)
 	{
-		
+		System.out.println(message);
 	}
 
 	@Override
 	public void sourceClosed(MessageSource source)
 	{
-
+		
 	}
 	
-	private sendCommand(String command)
+	private void sendMessage(String message)
 	{
-		
+		connectionInterface.sendMessage(message);
 	}
 }
