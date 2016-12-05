@@ -17,17 +17,24 @@ public class BattleClient extends MessageSource implements MessageListener
 		throws IOException
 	{
 		connectionInterface = new ConnectionInterface(new Socket(host, port));
+		connectionInterface.addMessageListener(this);
+		connectionInterface.run();
 	}
 	
 	@Override
 	public void messageReceived(String message, MessageSource source)
 	{
-
+		
 	}
 
 	@Override
 	public void sourceClosed(MessageSource source)
 	{
 
+	}
+	
+	private sendCommand(String command)
+	{
+		
 	}
 }

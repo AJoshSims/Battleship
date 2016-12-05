@@ -42,10 +42,10 @@ public class BattleServer implements MessageListener
 		{
 			clientSpecificSocket = welcomeSocket.accept();
 			
-			ConnectionInterface client = 
+			ConnectionInterface connectionInterface = 
 				new ConnectionInterface(clientSpecificSocket);
-			client.addMessageListener(this);
-			Thread clientThread = new Thread(client);
+			connectionInterface.addMessageListener(this);
+			Thread clientThread = new Thread(connectionInterface);
 			clientThread.start();
 		}
 	}
