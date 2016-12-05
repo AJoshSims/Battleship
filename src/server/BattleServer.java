@@ -16,9 +16,9 @@ public class BattleServer implements MessageListener
 	ServerSocket welcomeSocket;
 	
 	// TODO error handling
-	BattleServer(int portNum) throws IOException
+	BattleServer(int port) throws IOException
 	{
-		welcomeSocket = new ServerSocket(portNum);
+		welcomeSocket = new ServerSocket(port);
 	}
 	
 	@Override
@@ -34,7 +34,7 @@ public class BattleServer implements MessageListener
 	}
 	
 	// TODO error handling
-	void listen(int portNum) throws IOException
+	void listen() throws IOException
 	{
 		Socket clientSpecificSocket = null;
 		// TODO no forever loop
@@ -44,6 +44,7 @@ public class BattleServer implements MessageListener
 			
 			ConnectionInterface client = 
 				new ConnectionInterface(clientSpecificSocket);
+			client.addMessageListener(this);
 			Thread clientThread = new Thread(client);
 			clientThread.start();
 		}
