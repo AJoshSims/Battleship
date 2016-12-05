@@ -50,6 +50,8 @@ public class ConnectionInterface extends MessageSource implements Runnable
 				}
 			}
 			
+			message = message.substring(0, message.length() - 4);
+			
 			notifyReceipt(message);
 		}
 	}
