@@ -112,13 +112,10 @@ public class BattleServer implements MessageListener
 					if (game == null)
 					{
 						game = new Game();
-						for (
-							int gridsToAdd = joinedClients.size(); 
-							gridsToAdd > 0;
-							--gridsToAdd)
+						for (String guy : joinedClients.keySet())
 						{	
 							game.addGrid(
-								connectionInterface.getUsername(), boardSize);
+								joinedClients.get(guy).getUsername(), boardSize);
 						}
 					}
 					break;
