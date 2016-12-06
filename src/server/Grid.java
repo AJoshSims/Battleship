@@ -19,6 +19,7 @@ class Grid
 		board = new Tile[boardSize][boardSize];
 		this.username = username;
 		createBoard();
+		placeShips();
 	}
 	
 	Tile[][] getBoard()
@@ -26,7 +27,7 @@ class Grid
 		return board;
 	}
 	
-	void createBoard()
+	private void createBoard()
 	{
 		for (int row = 0; row < boardSize; ++row)
 		{
@@ -37,7 +38,7 @@ class Grid
 		}
 	}
 	
-	void placeShips()
+	private void placeShips()
 	{	
 		int shipLength = -1;
 		Tile[] shipSegmentTiles = null;
@@ -200,7 +201,7 @@ class Grid
 		private char getTileText(String username)
 		{
 			if (
-				(username != Grid.this.username)
+				(!username.equals(Grid.this.username))
 				&& ((tileText == TileText.CARRIER)
 				|| (tileText == TileText.BATTLESHIP)
 				|| (tileText == TileText.CRUISER)

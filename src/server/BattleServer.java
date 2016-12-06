@@ -6,7 +6,6 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import common.ConnectionInterface;
@@ -50,31 +49,66 @@ public class BattleServer implements MessageListener
 			// TODO game in progress
 			// TODO mag num
 			// TODO error handling
-			String command = messageSegments[0];
+			
+			String arg04 = null;
+			String arg03 = null;
+			String arg02 = null;
+			String arg01 = null;
+			switch (messageSegments.length)
+			{
+				case 4:
+					arg04 = messageSegments[3];
+					if (arg04.charAt(arg04.length() - 1) == '\n')
+					{
+						arg04 = arg04.substring(0, arg04.length() - 1);
+					}
+				case 3:
+					arg03 = messageSegments[2];
+					if (arg03.charAt(arg03.length() - 1) == '\n')
+					{
+						arg03 = arg03.substring(0, arg03.length() - 1);
+					}
+				case 2:
+					arg02 = messageSegments[1];
+					if (arg02.charAt(arg02.length() - 1) == '\n')
+					{
+						arg02 = arg02.substring(0, arg02.length() - 1);
+					}
+				case 1:
+					arg01 = messageSegments[0];
+					if (arg01.charAt(arg01.length() - 1) == '\n')
+					{
+						arg01 = arg01.substring(0, arg01.length() - 1);
+					}
+				case 0:
+					break;
+			}
 			
 			// TODO remove
-			System.out.println(command);
+			System.out.println(arg01);
 			
-			switch (command)
+			switch (arg01)
 			{
-				case "/join\n":
-					String username01 = messageSegments[1];
-					if (joinedClients.containsKey(username01))
+				case "/join":
+					// TODO remove
+					System.out.println(arg02);
+					
+					if (joinedClients.containsKey(arg01))
 					{
 						connectionInterface.sendMessage(
-							"The username \"" + username01 + "\" is already " +
+							"The username \"" + arg02 + "\" is already " +
 							"taken" + 
 							"\nEnter /join followed by a different username");
 						return;	
 					}
 					
-					joinedClients.put(username01, connectionInterface);
-					connectionInterface.setUsername(username01);
-					connectionInterface.sendMessage("!!! " + username01 + 
+					joinedClients.put(arg02, connectionInterface);
+					connectionInterface.setUsername(arg02);
+					connectionInterface.sendMessage("!!! " + arg02 + 
 						" has joined");
 					break;
 					
-				case "/play\n":
+				case "/play":
 					if (game == null)
 					{
 						game = new Game();
@@ -82,33 +116,34 @@ public class BattleServer implements MessageListener
 							int gridsToAdd = joinedClients.size(); 
 							gridsToAdd > 0;
 							--gridsToAdd)
-						{
+						{	
 							game.addGrid(
 								connectionInterface.getUsername(), boardSize);
 						}
 					}
 					break;
 					
-				case "/attack\n":
-					String username02 = messageSegments[1];
-					int row = Integer.parseInt(messageSegments[2]);
-					int column = Integer.parseInt(messageSegments[3]); 
+				case "/attack":
+					int row = Integer.parseInt(arg03);
+					int column = Integer.parseInt(arg04); 
 					if (game != null)
 					{
-						game.attack(username02, row, column);
+						game.attack(arg02, row, column);
 					}
 					break;
 					
-				case "/show\n":
+				case "/show":
 					if (game != null)
 					{
-						String username03 = messageSegments[1];
+						// TODO remove
+						System.out.println(arg02);
+						
 						connectionInterface.sendMessage(
-							game.getGridString(username03));
+							game.getGridString(arg02));
 					}
 					break;
 					
-				case "/users\n":
+				case "/users":
 					String joinedClientsUsernames = "";
 					for (String joinedClientUsername : joinedClients.keySet())
 					{
@@ -121,11 +156,11 @@ public class BattleServer implements MessageListener
 					connectionInterface.sendMessage(joinedClientsUsernames);
 					break;
 					
-				case "/quit\n":
+				case "/quit":
 					
 					break;
 					
-				case "/help\n":
+				case "/help":
 					connectionInterface.sendMessage(
 						"/join <username>" +
 						"\n/play" +
