@@ -51,26 +51,30 @@ public class BattleServer implements MessageListener
 			// TODO mag num
 			// TODO error handling
 			String command = messageSegments[0];
-			String username = messageSegments[1];
+			
+			// TODO remove
+			System.out.println(command);
+			
 			switch (command)
 			{
-				case "/join":
-					if (joinedClients.containsKey(username))
+				case "/join\n":
+					String username01 = messageSegments[1];
+					if (joinedClients.containsKey(username01))
 					{
 						connectionInterface.sendMessage(
-							"The username \"" + username + "\" is already " +
+							"The username \"" + username01 + "\" is already " +
 							"taken" + 
 							"\nEnter /join followed by a different username");
 						return;	
 					}
 					
-					joinedClients.put(username, connectionInterface);
-					connectionInterface.setUsername(username);
-					connectionInterface.sendMessage("!!! " + username + 
+					joinedClients.put(username01, connectionInterface);
+					connectionInterface.setUsername(username01);
+					connectionInterface.sendMessage("!!! " + username01 + 
 						" has joined");
 					break;
 					
-				case "/play":
+				case "/play\n":
 					if (game == null)
 					{
 						game = new Game();
@@ -85,24 +89,26 @@ public class BattleServer implements MessageListener
 					}
 					break;
 					
-				case "/attack":
+				case "/attack\n":
+					String username02 = messageSegments[1];
 					int row = Integer.parseInt(messageSegments[2]);
 					int column = Integer.parseInt(messageSegments[3]); 
 					if (game != null)
 					{
-						game.attack(username, row, column);
+						game.attack(username02, row, column);
 					}
 					break;
 					
-				case "/show":
+				case "/show\n":
 					if (game != null)
 					{
+						String username03 = messageSegments[1];
 						connectionInterface.sendMessage(
-							game.getGridString(username));
+							game.getGridString(username03));
 					}
 					break;
 					
-				case "/users":
+				case "/users\n":
 					String joinedClientsUsernames = "";
 					for (String joinedClientUsername : joinedClients.keySet())
 					{
@@ -115,10 +121,11 @@ public class BattleServer implements MessageListener
 					connectionInterface.sendMessage(joinedClientsUsernames);
 					break;
 					
-				case "/quit":
+				case "/quit\n":
 					
 					break;
-				case "/help":
+					
+				case "/help\n":
 					connectionInterface.sendMessage(
 						"/join <username>" +
 						"\n/play" +
@@ -127,6 +134,7 @@ public class BattleServer implements MessageListener
 						"\n/users" +
 						"\n/quit");
 					break;
+					
 				default:
 					connectionInterface.sendMessage(
 						"That is an invalid command" +
