@@ -3,6 +3,9 @@ package client;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Scanner;
+
+// TODO close things
 
 public class BattleDriver
 {
@@ -28,6 +31,15 @@ public class BattleDriver
 		catch (IOException e)
 		{
 			e.printStackTrace();
+		}
+		
+		Scanner userInput = new Scanner(System.in);
+		String command = "";
+		// TODO forever loop
+		while (true)
+		{
+			command = userInput.nextLine();
+			battleClient.sendCommand(command);
 		}
 	}
 }

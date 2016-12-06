@@ -16,11 +16,11 @@ import common.MessageSource;
 public class BattleClient extends MessageSource implements MessageListener
 {	
 	private ConnectionInterface connectionInterface;
-			
+		
 	// TODO error handling
 	BattleClient(InetAddress host, int port, String username)
 		throws IOException
-	{				
+	{					
 		// TODO close socket?
 		Socket clientSpecificSocket = new Socket(host, port);
 		PrintWriter socketOutput = 
@@ -36,15 +36,13 @@ public class BattleClient extends MessageSource implements MessageListener
 		Thread thread = new Thread(connectionInterface);
 		thread.start();
 		
-		// TODO error handling for already taken username
-		// TODO change
-		connectionInterface.sendMessage("");
+		sendCommand("/join " + username);
 	}
 	
 	@Override
 	public void messageReceived(String message, MessageSource source)
 	{
-		System.out.print(message);
+		System.out.println(message);
 		System.out.flush();
 	}
 
@@ -54,7 +52,7 @@ public class BattleClient extends MessageSource implements MessageListener
 		
 	}
 	
-	void sendMessage(String message)
+	void sendCommand(String message)
 	{
 		connectionInterface.sendMessage(message);
 	}
