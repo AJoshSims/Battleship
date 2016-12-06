@@ -11,9 +11,9 @@ class Game
 		grids = new HashMap<String, Grid>();
 	}
 	
-	String getGridString(String username)
+	String getGridString(String usernameOther, String usernameThis)
 	{
-		return grids.get(username).getBoardString(username);
+		return grids.get(usernameOther).getBoardString(usernameThis);
 	}
 	
 	void addGrid(String username, int boardSize)

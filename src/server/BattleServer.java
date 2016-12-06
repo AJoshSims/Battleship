@@ -132,11 +132,9 @@ public class BattleServer implements MessageListener
 				case "/show":
 					if (game != null)
 					{
-						// TODO remove
-						System.out.println(arg02);
-						
 						connectionInterface.sendMessage(
-							game.getGridString(arg02));
+							game.getGridString(
+							arg02, connectionInterface.getUsername()));
 					}
 					break;
 					
