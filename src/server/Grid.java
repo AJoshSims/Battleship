@@ -7,14 +7,15 @@ import utilities.MutableInteger;
 
 class Grid
 {
-	static int boardSize = 10;
+	private final int boardSize;
 	
 	private Tile[][] board;
 	
 	private final String username;
 	
-	Grid(String username)
+	Grid(String username, int boardSize)
 	{
+		this.boardSize = boardSize;
 		board = new Tile[boardSize][boardSize];
 		this.username = username;
 		createBoard();

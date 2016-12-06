@@ -11,14 +11,14 @@ class Game
 		grids = new HashMap<String, Grid>();
 	}
 	
-	HashMap<String, Grid> getGrids()
+	String getGridString(String username)
 	{
-		return grids;
+		return grids.get(username).getBoardString(username);
 	}
 	
-	void addGrid(String username)
+	void addGrid(String username, int boardSize)
 	{
-		grids.put(username, new Grid(username));
+		grids.put(username, new Grid(username, boardSize));
 	}
 	
 	void attack(String username, int row, int column)

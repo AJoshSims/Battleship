@@ -9,7 +9,7 @@ public class ConnectionInterface extends MessageSource implements Runnable
 	private PrintWriter socketOutput;
 
 	private BufferedReader socketInput;
-	
+		
 	private String username;
 	
 	public ConnectionInterface(

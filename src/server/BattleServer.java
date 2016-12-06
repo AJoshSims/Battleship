@@ -7,24 +7,31 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import common.ConnectionInterface;
 
-//TODO no globl variables?
+//TODO no global variables?
 
 import common.MessageListener;
 import common.MessageSource;
 
 public class BattleServer implements MessageListener
-{
-	ServerSocket welcomeSocket;
+{		
+	private final int boardSize;
 	
-	ArrayList<ConnectionInterface> joinedClients = 
-		new ArrayList<ConnectionInterface>();
+	private Game game;
+	
+	private ServerSocket welcomeSocket;
+	
+	private HashMap<String, ConnectionInterface> joinedClients = 
+		new HashMap<String, ConnectionInterface>();
 		
 	// TODO error handling
 	BattleServer(int port, int boardSize) throws IOException
 	{
+		this.boardSize = boardSize;
+		game = null;
 		welcomeSocket = new ServerSocket(port);
 	}
 	
@@ -44,47 +51,70 @@ public class BattleServer implements MessageListener
 			// TODO mag num
 			// TODO error handling
 			String command = messageSegments[0];
+			String username = messageSegments[1];
 			switch (command)
 			{
 				case "/join":
-					String username = messageSegments[1];
-					for (ConnectionInterface joinedClient : joinedClients)
+					if (joinedClients.containsKey(username))
 					{
-						if (joinedClient.getUsername().equals(username))
-						{
-							connectionInterface.sendMessage(
-								"The username \"" + username + "\" is " +
-								"already taken" + 
-								"\nEnter /join followed by a different " +
-								"username");
-							return;
-						}		
+						connectionInterface.sendMessage(
+							"The username \"" + username + "\" is already " +
+							"taken" + 
+							"\nEnter /join followed by a different username");
+						return;	
 					}
-
+					
+					joinedClients.put(username, connectionInterface);
 					connectionInterface.setUsername(username);
 					connectionInterface.sendMessage("!!! " + username + 
 						" has joined");
 					break;
 					
 				case "/play":
+					if (game == null)
+					{
+						game = new Game();
+						for (
+							int gridsToAdd = joinedClients.size(); 
+							gridsToAdd > 0;
+							--gridsToAdd)
+						{
+							game.addGrid(
+								connectionInterface.getUsername(), boardSize);
+						}
+					}
+					break;
 					
-					break;
 				case "/attack":
+					int row = Integer.parseInt(messageSegments[2]);
+					int column = Integer.parseInt(messageSegments[3]); 
+					if (game != null)
+					{
+						game.attack(username, row, column);
+					}
 					break;
+					
 				case "/show":
+					if (game != null)
+					{
+						connectionInterface.sendMessage(
+							game.getGridString(username));
+					}
 					break;
+					
 				case "/users":
 					String joinedClientsUsernames = "";
-					for (ConnectionInterface joinedClient : joinedClients)
+					for (String joinedClientUsername : joinedClients.keySet())
 					{
 						joinedClientsUsernames += 
-							joinedClient.getUsername() + "\n";
+							joinedClientUsername + "\n";
 					}
 					joinedClientsUsernames = 
 						joinedClientsUsernames.substring(
 						0, joinedClientsUsernames.length() - 1);
 					connectionInterface.sendMessage(joinedClientsUsernames);
 					break;
+					
 				case "/quit":
 					
 					break;
