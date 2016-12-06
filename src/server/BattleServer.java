@@ -93,7 +93,7 @@ public class BattleServer implements MessageListener
 					// TODO remove
 					System.out.println(arg02);
 					
-					if (joinedClients.containsKey(arg01))
+					if (joinedClients.containsKey(arg02))
 					{
 						connectionInterface.sendMessage(
 							"The username \"" + arg02 + "\" is already " +
@@ -152,7 +152,7 @@ public class BattleServer implements MessageListener
 					break;
 					
 				case "/quit":
-					
+					sourceClosed(source);
 					break;
 					
 				case "/help":
@@ -176,7 +176,16 @@ public class BattleServer implements MessageListener
 	@Override
 	public void sourceClosed(MessageSource source)
 	{
-		
+		if (source instanceof ConnectionInterface)
+		{
+			ConnectionInterface connectionInterface =
+				(ConnectionInterface) source;
+			if (joinedClients.containsKey(connectionInterface.getUsername()))
+			{				
+				joinedClients.remove(connectionInterface.getUsername());
+			}
+			connectionInterface.removeMessageListener(this);
+		}
 	}
 	
 	// TODO error handling
