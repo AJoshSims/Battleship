@@ -42,75 +42,93 @@ public class BattleServer implements MessageListener
 	public void messageReceived(String message, MessageSource source)
 	{
 		// TODO change
-		if (source instanceof ConnectionInterface)
+		if (!(source instanceof ConnectionInterface))
 		{
-			ConnectionInterface connectionInterface = 
-				(ConnectionInterface) source;
-			
-			String[] messageSegments = message.split(" ");
-			
-			// TODO game in progress
-			// TODO mag num
-			// TODO error handling
-			
-			String arg04 = null;
-			String arg03 = null;
-			String arg02 = null;
-			String arg01 = null;
-			switch (messageSegments.length)
-			{
-				case 4:
-					arg04 = messageSegments[3];
-					if (arg04.charAt(arg04.length() - 1) == '\n')
-					{
-						arg04 = arg04.substring(0, arg04.length() - 1);
-					}
-				case 3:
-					arg03 = messageSegments[2];
-					if (arg03.charAt(arg03.length() - 1) == '\n')
-					{
-						arg03 = arg03.substring(0, arg03.length() - 1);
-					}
-				case 2:
-					arg02 = messageSegments[1];
-					if (arg02.charAt(arg02.length() - 1) == '\n')
-					{
-						arg02 = arg02.substring(0, arg02.length() - 1);
-					}
-				case 1:
-					arg01 = messageSegments[0];
-					if (arg01.charAt(arg01.length() - 1) == '\n')
-					{
-						arg01 = arg01.substring(0, arg01.length() - 1);
-					}
-				case 0:
-					break;
-			}
-			
-			// TODO remove
-			System.out.println(arg01);
-			
-			// TODO robust error handling for invalid commands
-			String messageBroadcast = null;
+			return;
+		}
+		
+		ConnectionInterface connectionInterface = 
+			(ConnectionInterface) source;
+					
+		String[] messageSegments = message.split(" ");
+		
+		// TODO game in progress
+		// TODO mag num
+		// TODO error handling
+		
+		String arg04 = null;
+		String arg03 = null;
+		String arg02 = null;
+		String arg01 = null;
+		switch (messageSegments.length)
+		{
+			case 4:
+				arg04 = messageSegments[3];
+				if (arg04.charAt(arg04.length() - 1) == '\n')
+				{
+					arg04 = arg04.substring(0, arg04.length() - 1);
+				}
+			case 3:
+				arg03 = messageSegments[2];
+				if (arg03.charAt(arg03.length() - 1) == '\n')
+				{
+					arg03 = arg03.substring(0, arg03.length() - 1);
+				}
+			case 2:
+				arg02 = messageSegments[1];
+				if (arg02.charAt(arg02.length() - 1) == '\n')
+				{
+					arg02 = arg02.substring(0, arg02.length() - 1);
+				}
+			case 1:
+				arg01 = messageSegments[0];
+				if (arg01.charAt(arg01.length() - 1) == '\n')
+				{
+					arg01 = arg01.substring(0, arg01.length() - 1);
+				}
+			case 0:
+				break;
+		}
+		
+		// TODO robust error handling for invalid commands
+		String messageBroadcast = null;
+		
+		boolean invalidCommand = false;
+		if (arg01 == null)
+		{
+			invalidCommand = true;
+		}
+		
+		else
+		{
 			switch (arg01)
 			{
 				case "/join":
-					// TODO remove
-					System.out.println(arg02);
-					
-					if (clientsJoined.containsKey(arg02))
+					if (arg02 == null)
 					{
-						connectionInterface.sendMessage(
-							"The username \"" + arg02 + "\" is already " +
-							"taken" + 
-							"\nEnter /join followed by a different username");
-						return;	
+						invalidCommand = true;
 					}
 					
-					clientsJoined.put(arg02, connectionInterface);
-					connectionInterface.setUsername(arg02);
-					connectionInterface.sendMessage("!!! " + arg02 + 
-						" has joined");
+					else if (arg02.equals(connectionInterface.getUsername()))
+					{
+						connectionInterface.sendMessage(
+							"You have already joined");
+					}
+					
+					else if (clientsJoined.containsKey(arg02) || arg02.equals(""))
+					{
+						connectionInterface.sendMessage(
+							"The username \"" + arg02 + "\" is unavailable" + 
+							"\nEnter /join followed by a different username");
+					}
+					
+					else
+					{
+						clientsJoined.put(arg02, connectionInterface);
+						connectionInterface.setUsername(arg02);
+						connectionInterface.sendMessage("!!! " + arg02 + 
+							" has joined");
+					}
 					break;
 					
 				case "/play":
@@ -118,15 +136,16 @@ public class BattleServer implements MessageListener
 					{
 						connectionInterface.sendMessage(
 							"Game already in progress");
-						
-						return;
 					}
 					
-					game = new Game();
-					for (String guy : clientsJoined.keySet())
-					{	
-						game.addGrid(guy, boardSize);
-						clientsStanding.put(guy, clientsJoined.get(guy));
+					else
+					{
+						game = new Game();
+						for (String guy : clientsJoined.keySet())
+						{	
+							game.addGrid(guy, boardSize);
+							clientsStanding.put(guy, clientsJoined.get(guy));
+						}
 					}
 					break;
 					
@@ -137,10 +156,9 @@ public class BattleServer implements MessageListener
 					{
 						connectionInterface.sendMessage(
 							"Game not in progress");
-						return;
 					}
 					
-					if (clientsStanding.get(arg02) == null)
+					else if (clientsStanding.get(arg02) == null)
 					{
 						if (clientsJoined.get(arg02) == null)
 						{
@@ -150,39 +168,43 @@ public class BattleServer implements MessageListener
 						}
 						connectionInterface.sendMessage(
 							"That user has already been eliminated");
-						return;
 					}
 					
-					// TODO error handling for coordinates
-								
-					game.attack(arg02, row, column);
-					
-					messageBroadcast = 
-						"Shots Fired at " + arg02 +
-						" by " + connectionInterface.getUsername();
-					
-					if (
-						game.getGrid(arg02).getRemainingShipSegments()
-						== 0)
+					else
 					{
-						messageBroadcast += 
-							"\n!!! All ships belonging to " + arg02 + 
-							" have been destroyed";
-						clientsStanding.remove(arg02);
+						// TODO error handling for coordinates
 						
-						if (clientsStanding.size() == 1)
+						game.attack(arg02, row, column);
+						
+						messageBroadcast = 
+							"Shots Fired at " + arg02 +
+							" by " + connectionInterface.getUsername();
+						
+						if (
+							game.getGrid(arg02).getRemainingShipSegments()
+							== 0)
 						{
-							// TODO switch turn message before win?
-							messageBroadcast += "\nGAME OVER: " + 
-								clientsStanding.keySet().toArray()[0] +
-								" wins!";
+							messageBroadcast += 
+								"\n!!! All ships belonging to " + arg02 + 
+								" have been destroyed";
+							clientsStanding.remove(arg02);
+							
+							if (clientsStanding.size() == 1)
+							{
+								// TODO switch turn message before win?
+								game = null;
+								messageBroadcast += "\nGAME OVER: " + 
+									clientsStanding.keySet().toArray()[0] +
+									" wins!";
+								clientsStanding.clear();
+							}
 						}
-					}
-					
-					for (String username : clientsJoined.keySet())
-					{
-						clientsJoined.get(username).sendMessage(
-							messageBroadcast);
+						
+						for (String username : clientsJoined.keySet())
+						{
+							clientsJoined.get(username).sendMessage(
+								messageBroadcast);
+						}
 					}
 					break;
 					
@@ -199,19 +221,20 @@ public class BattleServer implements MessageListener
 						if (clientsJoined.get(arg02) == null)
 						{
 							connectionInterface.sendMessage(
-								"No such user has joined this game");
+								"No such user has joined");
 							return;
 						}
 						connectionInterface.sendMessage(
 							"That user has already been eliminated");
-						return;
 					}
-
-					connectionInterface.sendMessage(
-						game.getGrid(arg02)
-						.getBoardString(
-						connectionInterface.getUsername()));
 					
+					else
+					{
+						connectionInterface.sendMessage(
+							game.getGrid(arg02)
+							.getBoardString(
+							connectionInterface.getUsername()));
+					}
 					break;
 					
 				case "/users":
@@ -227,38 +250,60 @@ public class BattleServer implements MessageListener
 					connectionInterface.sendMessage(joinedClientsUsernames);
 					break;
 					
+					//TODO handle client side of quit
 				case "/quit":
-					sourceClosed(source);
-					
-					if (clientsStanding.size() == 1)
+					if (arg02 != null)
 					{
-						// TODO switch turn message before win?
-						messageBroadcast = "GAME OVER: " + 
-							clientsStanding.keySet().toArray()[0] +
-							" wins!";
-						for (String username : clientsJoined.keySet())
+						invalidCommand = true;
+					}
+					
+					else
+					{
+						sourceClosed(source);
+						
+						if (clientsStanding.size() == 1)
 						{
-							clientsJoined.get(username).sendMessage(
-								messageBroadcast);
+							// TODO switch turn message before win?
+							game = null;
+							messageBroadcast = "GAME OVER: " + 
+								clientsStanding.keySet().toArray()[0] +
+								" wins!";
+							clientsStanding.clear();
+							
+							for (String username : clientsJoined.keySet())
+							{
+								clientsJoined.get(username).sendMessage(
+									messageBroadcast);
+							}
 						}
 					}
 					break;
 					
 				case "/help":
+					if (arg02 != null)
+					{
+						invalidCommand = true;
+					}
+					
 					connectionInterface.sendMessage(
-						"/join <username>" +
-						"\n/play" +
-						"\n/attack <username> <[0-9]+> <[0-9]+>" +
-						"\n/show <username>" +
-						"\n/users" +
-						"\n/quit");
+					"/join <username>" +
+					"\n/play" +
+					"\n/attack <username> <[0-9]+> <[0-9]+>" +
+					"\n/show <username>" +
+					"\n/users" +
+					"\n/quit");
 					break;
 					
 				default:
-					connectionInterface.sendMessage(
-						"Invalid command: " + message);
-			}						
+					invalidCommand = true;
+			}
 		}
+		
+		if (invalidCommand == true)
+		{
+			connectionInterface.sendMessage(
+				"Invalid command: " + message);
+		}		
 	}
 
 	@Override

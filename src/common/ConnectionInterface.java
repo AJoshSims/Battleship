@@ -17,6 +17,7 @@ public class ConnectionInterface extends MessageSource implements Runnable
 	{
 		this.socketOutput = socketOutput;
 		this.socketInput = socketInput;
+		username = "";
 	}
 	
 	public String getUsername()

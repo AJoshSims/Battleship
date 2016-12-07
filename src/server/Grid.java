@@ -1,5 +1,7 @@
 package server;
 
+import java.util.Arrays;
+
 import utilities.Constants;
 import utilities.MutableInteger;
 
@@ -21,7 +23,8 @@ class Grid
 		board = new Tile[boardSize][boardSize];
 		this.username = username;
 		createBoard();
-		remainingShipSegments = placeShips();
+		// TODO change to placeShips
+		remainingShipSegments = placeShipsFew();
 	}
 	
 	Tile[][] getBoard()
@@ -55,13 +58,45 @@ class Grid
 		int shipSegmentsPlaced = 0;
 		int shipLength = -1;
 		Tile[] shipSegmentTiles = null;
-		for (ShipSegment ship : ShipSegment.values())
+		ShipSegment[] values = Arrays.copyOf(ShipSegment.values(), 5);
+		for (ShipSegment ship : values)
 		{
-			if (ship == ShipSegment.NONE)
+			if (ship != ShipSegment.NONE)
 			{
 				break;
 			}
 			
+			shipLength = ship.getLengthOfWhole();
+			
+			do
+			{
+				shipSegmentTiles = buildShip(ship, shipLength);
+			}
+			while (shipSegmentTiles == null);
+			
+			for (Tile shipSegmentTile : shipSegmentTiles)
+			{
+				board[shipSegmentTile.row][shipSegmentTile.column] =
+					shipSegmentTile;
+				++shipSegmentsPlaced;
+			}
+		}
+		
+		return shipSegmentsPlaced;
+	}
+	
+	// TODO overload placeships instead?
+	private int placeShipsFew()
+	{
+		int shipSegmentsPlaced = 0;
+		int shipLength = -1;
+		Tile[] shipSegmentTiles = null;
+		ShipSegment[] values = ShipSegment.values();
+		ShipSegment[] valuesFew = new ShipSegment[2];
+		valuesFew[0] = values[3];
+		valuesFew[1] = values[4];
+		for (ShipSegment ship : valuesFew)
+		{
 			shipLength = ship.getLengthOfWhole();
 			
 			do
