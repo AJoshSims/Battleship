@@ -32,6 +32,8 @@ public class ConnectionInterface extends MessageSource implements Runnable
 	public void run()
 	{
 		// TODO no forever loop
+		// test if socketInputreadline return null would work
+		// also only run while ^ that and while this guy has listeners
 		while (true)
 		{
 			// TODO error handling

@@ -13,18 +13,30 @@ class Grid
 	
 	private final String username;
 	
+	private int remainingShipSegments;
+	
 	Grid(String username, int boardSize)
 	{
 		this.boardSize = boardSize;
 		board = new Tile[boardSize][boardSize];
 		this.username = username;
 		createBoard();
-		placeShips();
+		remainingShipSegments = placeShips();
 	}
 	
 	Tile[][] getBoard()
 	{
 		return board;
+	}
+	
+	int getRemainingShipSegments()
+	{
+		return remainingShipSegments;
+	}
+	
+	private void decrementRemainingShipSegments()
+	{
+		--remainingShipSegments;
 	}
 	
 	private void createBoard()
@@ -38,8 +50,9 @@ class Grid
 		}
 	}
 	
-	private void placeShips()
+	private int placeShips()
 	{	
+		int shipSegmentsPlaced = 0;
 		int shipLength = -1;
 		Tile[] shipSegmentTiles = null;
 		for (ShipSegment ship : ShipSegment.values())
@@ -61,8 +74,11 @@ class Grid
 			{
 				board[shipSegmentTile.row][shipSegmentTile.column] =
 					shipSegmentTile;
+				++shipSegmentsPlaced;
 			}
 		}
+		
+		return shipSegmentsPlaced;
 	}
 	
 	private Tile[] buildShip(
@@ -214,18 +230,21 @@ class Grid
 			return tileText.getTileText();
 		}
 		
-		void shoot()
+		boolean shoot()
 		{
 			if (shipSegment != ShipSegment.NONE)
 			{
 				hit = true;
 				tileText = TileText.HIT;
+				decrementRemainingShipSegments();
 			}
 			else
 			{
 				hit = false;
 				tileText = TileText.MISS;
 			}
+			
+			return hit;
 		}
 	}
 }

@@ -11,9 +11,9 @@ class Game
 		grids = new HashMap<String, Grid>();
 	}
 	
-	String getGridString(String usernameOther, String usernameThis)
+	Grid getGrid(String username)
 	{
-		return grids.get(usernameOther).getBoardString(usernameThis);
+		return grids.get(username);
 	}
 	
 	void addGrid(String username, int boardSize)
@@ -21,10 +21,12 @@ class Game
 		grids.put(username, new Grid(username, boardSize));
 	}
 	
-	void attack(String username, int row, int column)
+	boolean attack(String username, int row, int column)
 	{
 		Grid.Tile[][] board = grids.get(username).getBoard();
 		
-		board[row][column].shoot();
+		boolean hit = board[row][column].shoot();
+		
+		return hit;
 	}
 }

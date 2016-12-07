@@ -23,7 +23,10 @@ public class BattleServer implements MessageListener
 	
 	private ServerSocket welcomeSocket;
 	
-	private HashMap<String, ConnectionInterface> joinedClients = 
+	private HashMap<String, ConnectionInterface> clientsJoined = 
+		new HashMap<String, ConnectionInterface>();
+	
+	private HashMap<String, ConnectionInterface> clientsStanding = 
 		new HashMap<String, ConnectionInterface>();
 		
 	// TODO error handling
@@ -87,13 +90,15 @@ public class BattleServer implements MessageListener
 			// TODO remove
 			System.out.println(arg01);
 			
+			// TODO robust error handling for invalid commands
+			String messageBroadcast = null;
 			switch (arg01)
 			{
 				case "/join":
 					// TODO remove
 					System.out.println(arg02);
 					
-					if (joinedClients.containsKey(arg02))
+					if (clientsJoined.containsKey(arg02))
 					{
 						connectionInterface.sendMessage(
 							"The username \"" + arg02 + "\" is already " +
@@ -102,45 +107,116 @@ public class BattleServer implements MessageListener
 						return;	
 					}
 					
-					joinedClients.put(arg02, connectionInterface);
+					clientsJoined.put(arg02, connectionInterface);
 					connectionInterface.setUsername(arg02);
 					connectionInterface.sendMessage("!!! " + arg02 + 
 						" has joined");
 					break;
 					
 				case "/play":
-					if (game == null)
+					if (game != null)
 					{
-						game = new Game();
-						for (String guy : joinedClients.keySet())
-						{	
-							game.addGrid(
-								joinedClients.get(guy).getUsername(), boardSize);
-						}
+						connectionInterface.sendMessage(
+							"Game already in progress");
+						
+						return;
+					}
+					
+					game = new Game();
+					for (String guy : clientsJoined.keySet())
+					{	
+						game.addGrid(guy, boardSize);
+						clientsStanding.put(guy, clientsJoined.get(guy));
 					}
 					break;
 					
 				case "/attack":
 					int row = Integer.parseInt(arg03);
 					int column = Integer.parseInt(arg04); 
-					if (game != null)
+					if (game == null)
 					{
-						game.attack(arg02, row, column);
+						connectionInterface.sendMessage(
+							"Game not in progress");
+						return;
+					}
+					
+					if (clientsStanding.get(arg02) == null)
+					{
+						if (clientsJoined.get(arg02) == null)
+						{
+							connectionInterface.sendMessage(
+								"No such user has joined this game");
+							return;
+						}
+						connectionInterface.sendMessage(
+							"That user has already been eliminated");
+						return;
+					}
+					
+					// TODO error handling for coordinates
+								
+					game.attack(arg02, row, column);
+					
+					messageBroadcast = 
+						"Shots Fired at " + arg02 +
+						" by " + connectionInterface.getUsername();
+					
+					if (
+						game.getGrid(arg02).getRemainingShipSegments()
+						== 0)
+					{
+						messageBroadcast += 
+							"\n!!! All ships belonging to " + arg02 + 
+							" have been destroyed";
+						clientsStanding.remove(arg02);
+						
+						if (clientsStanding.size() == 1)
+						{
+							// TODO switch turn message before win?
+							messageBroadcast += "\nGAME OVER: " + 
+								clientsStanding.keySet().toArray()[0] +
+								" wins!";
+						}
+					}
+					
+					for (String username : clientsJoined.keySet())
+					{
+						clientsJoined.get(username).sendMessage(
+							messageBroadcast);
 					}
 					break;
 					
 				case "/show":
-					if (game != null)
+					if (game == null)
 					{
 						connectionInterface.sendMessage(
-							game.getGridString(
-							arg02, connectionInterface.getUsername()));
+							"Game not in progress");
+						return;
 					}
+					
+					if (clientsStanding.get(arg02) == null)
+					{
+						if (clientsJoined.get(arg02) == null)
+						{
+							connectionInterface.sendMessage(
+								"No such user has joined this game");
+							return;
+						}
+						connectionInterface.sendMessage(
+							"That user has already been eliminated");
+						return;
+					}
+
+					connectionInterface.sendMessage(
+						game.getGrid(arg02)
+						.getBoardString(
+						connectionInterface.getUsername()));
+					
 					break;
 					
 				case "/users":
 					String joinedClientsUsernames = "";
-					for (String joinedClientUsername : joinedClients.keySet())
+					for (String joinedClientUsername : clientsJoined.keySet())
 					{
 						joinedClientsUsernames += 
 							joinedClientUsername + "\n";
@@ -153,6 +229,19 @@ public class BattleServer implements MessageListener
 					
 				case "/quit":
 					sourceClosed(source);
+					
+					if (clientsStanding.size() == 1)
+					{
+						// TODO switch turn message before win?
+						messageBroadcast = "GAME OVER: " + 
+							clientsStanding.keySet().toArray()[0] +
+							" wins!";
+						for (String username : clientsJoined.keySet())
+						{
+							clientsJoined.get(username).sendMessage(
+								messageBroadcast);
+						}
+					}
 					break;
 					
 				case "/help":
@@ -167,8 +256,7 @@ public class BattleServer implements MessageListener
 					
 				default:
 					connectionInterface.sendMessage(
-						"That is an invalid command" +
-						"\nEnter /help to get a list of valid commands");
+						"Invalid command: " + message);
 			}						
 		}
 	}
@@ -180,11 +268,10 @@ public class BattleServer implements MessageListener
 		{
 			ConnectionInterface connectionInterface =
 				(ConnectionInterface) source;
-			if (joinedClients.containsKey(connectionInterface.getUsername()))
-			{				
-				joinedClients.remove(connectionInterface.getUsername());
-			}
+
 			connectionInterface.removeMessageListener(this);
+			
+			clientsJoined.remove(connectionInterface.getUsername());
 		}
 	}
 	
@@ -193,6 +280,7 @@ public class BattleServer implements MessageListener
 	{
 		Socket clientSpecificSocket = null;
 		// TODO no forever loop
+		// while welcomesocket is working?
 		while (true)
 		{
 			// TODO remove
