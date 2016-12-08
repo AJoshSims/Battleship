@@ -78,6 +78,11 @@ public class BattleServer implements MessageListener
 				else if (arg04.charAt(arg04.length() - 1) == '\n')
 				{
 					arg04 = arg04.substring(0, arg04.length() - 1);
+					
+					if (arg04.isEmpty())
+					{
+						invalidCommand = true;
+					}
 				}
 			case 3:
 				arg03 = messageSegments[2];
@@ -89,6 +94,11 @@ public class BattleServer implements MessageListener
 				else if (arg03.charAt(arg03.length() - 1) == '\n')
 				{
 					arg03 = arg03.substring(0, arg03.length() - 1);
+					
+					if (arg03.isEmpty())
+					{
+						invalidCommand = true;
+					}
 				}
 			case 2:
 				arg02 = messageSegments[1];
@@ -100,6 +110,11 @@ public class BattleServer implements MessageListener
 				else if (arg02.charAt(arg02.length() - 1) == '\n')
 				{
 					arg02 = arg02.substring(0, arg02.length() - 1);
+					
+					if (arg02.isEmpty())
+					{
+						invalidCommand = true;
+					}
 				}
 			case 1:
 				arg01 = messageSegments[0];
@@ -108,9 +123,14 @@ public class BattleServer implements MessageListener
 					invalidCommand = true;
 				}
 				
-				if (arg01.charAt(arg01.length() - 1) == '\n')
+				else if (arg01.charAt(arg01.length() - 1) == '\n')
 				{
 					arg01 = arg01.substring(0, arg01.length() - 1);
+					
+					if (arg01.isEmpty())
+					{
+						invalidCommand = true;
+					}
 				}
 				break;
 				
