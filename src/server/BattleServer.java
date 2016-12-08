@@ -152,11 +152,23 @@ public class BattleServer implements MessageListener
 					{
 						invalidCommand = true;
 					}
+
+					// TODO user has to be joined to execute commands?
+//					else if (usernameSource.equals(""))
+//					{
+//
+//					}
 					
 					else if (game != null)
 					{
 						connectionInterface.sendMessage(
 							"Game already in progress");
+					}
+					
+					else if (clientsJoined.size() < 2)
+					{
+						connectionInterface.sendMessage("Not enough players " +
+							"to play the game");
 					}
 					
 					else
@@ -165,8 +177,8 @@ public class BattleServer implements MessageListener
 						for (String username : clientsJoined.keySet())
 						{	
 							game.addGrid(username, boardSize);
-							clientsInGame.put(arg02, connectionInterface);
-							clientsStanding.put(username, clientsInGame.get(username));
+							clientsInGame.put(username, clientsJoined.get(username));
+							clientsStanding.put(username, clientsJoined.get(username));
 
 							clientThat = clientsInGame.get(username);
 							clientThat.sendMessage("The game begins");
