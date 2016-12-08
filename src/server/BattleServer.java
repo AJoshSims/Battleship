@@ -70,25 +70,25 @@ public class BattleServer implements MessageListener
 		{
 			case 4:
 				arg04 = messageSegments[3];
-				if (arg04.charAt(arg04.length() - 1) == '\n')
+				if (!arg04.isEmpty() && arg04.charAt(arg04.length() - 1) == '\n')
 				{
 					arg04 = arg04.substring(0, arg04.length() - 1);
 				}
 			case 3:
 				arg03 = messageSegments[2];
-				if (arg03.charAt(arg03.length() - 1) == '\n')
+				if (!arg03.isEmpty() && arg03.charAt(arg03.length() - 1) == '\n')
 				{
 					arg03 = arg03.substring(0, arg03.length() - 1);
 				}
 			case 2:
 				arg02 = messageSegments[1];
-				if (arg02.charAt(arg02.length() - 1) == '\n')
+				if (!arg02.isEmpty() && arg02.charAt(arg02.length() - 1) == '\n')
 				{
 					arg02 = arg02.substring(0, arg02.length() - 1);
 				}
 			case 1:
 				arg01 = messageSegments[0];
-				if (arg01.charAt(arg01.length() - 1) == '\n')
+				if (!arg01.isEmpty() && arg01.charAt(arg01.length() - 1) == '\n')
 				{
 					arg01 = arg01.substring(0, arg01.length() - 1);
 				}
@@ -220,6 +220,12 @@ public class BattleServer implements MessageListener
 				    		break;
 				    	}
 						
+						else if (usernameSource.equals(""))
+						{
+							connectionInterface.sendMessage(
+								"You must join first");
+						}
+				    	
 				    	else if (game == null)
 						{
 							connectionInterface.sendMessage(
@@ -291,6 +297,16 @@ public class BattleServer implements MessageListener
 									}
 									
 									clientsInGame.clear();
+									break;
+								}
+							}
+							
+							for (String username : clientsInGame.keySet())
+							{
+								clientThat = clientsInGame.get(username);
+								if (clientThat != null)
+								{
+									clientThat.sendMessage(messageBroadcast);
 								}
 							}
 						}
@@ -301,6 +317,12 @@ public class BattleServer implements MessageListener
 					if ((arg02 == null) || (arg03 != null))
 					{
 						invalidCommand = true;
+					}
+					
+					else if (usernameSource.equals(""))
+					{
+						connectionInterface.sendMessage(
+							"You must join first");
 					}
 					
 					else if (arg02 != null)
@@ -346,6 +368,12 @@ public class BattleServer implements MessageListener
 						invalidCommand = true;
 					}
 					
+					else if (usernameSource.equals(""))
+					{
+						connectionInterface.sendMessage(
+							"You must join first");
+					}
+					
 					else
 					{
 						String users = "";
@@ -367,6 +395,12 @@ public class BattleServer implements MessageListener
 					if (arg02 != null)
 					{
 						invalidCommand = true;
+					}
+					
+					else if (usernameSource.equals(""))
+					{
+						connectionInterface.sendMessage(
+							"You must join first");
 					}
 					
 					else if (game == null)
@@ -416,6 +450,16 @@ public class BattleServer implements MessageListener
 							}
 							
 							clientsInGame.clear();
+							break;
+						}
+						
+						for (String username : clientsInGame.keySet())
+						{
+							clientThat = clientsInGame.get(username);
+							if (clientThat != null)
+							{
+								clientThat.sendMessage(messageBroadcast);
+							}
 						}
 					}
 					break;
