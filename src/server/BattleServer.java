@@ -232,7 +232,7 @@ public class BattleServer implements MessageListener
 								"Game not in progress");
 						}
 						
-						else if (!clientsInGame.containsKey(usernameSource))
+						else if (clientsInGame.get(usernameSource) == null)
 						{
 							connectionInterface.sendMessage(
 								"You are not in the current game");
@@ -334,7 +334,7 @@ public class BattleServer implements MessageListener
 							return;
 						}
 						
-						else if (!clientsInGame.containsKey(usernameSource))
+						else if (clientsInGame.get(usernameSource) == null)
 						{
 							connectionInterface.sendMessage(
 								"You are not in the current game");
@@ -409,7 +409,7 @@ public class BattleServer implements MessageListener
 							"Game not in progress");
 					}
 					
-					else if (!clientsInGame.containsKey(usernameSource))
+					else if (clientsInGame.get(usernameSource) == null)
 					{
 						connectionInterface.sendMessage(
 							"You are not in the current game");
