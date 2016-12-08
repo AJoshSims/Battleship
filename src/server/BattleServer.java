@@ -154,10 +154,11 @@ public class BattleServer implements MessageListener
 					}
 
 					// TODO user has to be joined to execute commands?
-//					else if (usernameSource.equals(""))
-//					{
-//
-//					}
+					else if (usernameSource.equals(""))
+					{
+						connectionInterface.sendMessage(
+							"You must join first");
+					}
 					
 					else if (game != null)
 					{
@@ -194,16 +195,47 @@ public class BattleServer implements MessageListener
 					
 					else
 					{	
-						if (game == null)
+						int row = -1;
+						int column = -1;
+						char[] maybeRow = arg03.toCharArray();
+						char[] maybeColumn = arg04.toCharArray();
+				    	for (char character : maybeRow)
+				    	{
+				    		if (!Character.isDigit(character))
+				    		{
+				    			invalidCommand = true;
+				    		}
+				    	}
+				    	for (char character : maybeColumn)
+				    	{
+				    		if (!Character.isDigit(character))
+				    		{
+				    			invalidCommand = true;
+				    		}
+				    	}
+				    	
+				    	if (invalidCommand == true)
+				    	{
+				    		// TODO or do nothing
+				    		break;
+				    	}
+						
+				    	else if (game == null)
 						{
 							connectionInterface.sendMessage(
 								"Game not in progress");
 						}
 						
+						else if (!clientsInGame.containsKey(usernameSource))
+						{
+							connectionInterface.sendMessage(
+								"You are not in the current game");
+						}
+						
 						else if (!clientsInGame.containsKey(arg02))
 						{
 							connectionInterface.sendMessage(
-								"No such user has joined this game");
+								"No such user entered this game");
 						}
 						
 						else if (clientsStanding.get(arg02) == null)
@@ -214,33 +246,8 @@ public class BattleServer implements MessageListener
 						
 						else
 						{
-							int row = -1;
-							int column = -1;
-							char[] maybeRow = arg03.toCharArray();
-							char[] maybeColumn = arg04.toCharArray();
-					    	for (char character : maybeRow)
-					    	{
-					    		// If part of the third command line argument is not a digit, 
-					    		// then the third command line argument cannot be a port number.
-					    		if (!Character.isDigit(character))
-					    		{
-					    			invalidCommand = true;
-					    		}
-					    	}
-					    	for (char character : maybeColumn)
-					    	{
-					    		// If part of the third command line argument is not a digit, 
-					    		// then the third command line argument cannot be a port number.
-					    		if (!Character.isDigit(character))
-					    		{
-					    			invalidCommand = true;
-					    		}
-					    	}				    	
-					    	if (invalidCommand == false)
-					    	{
-					    		row = Integer.parseInt(arg03);
-					    		column = Integer.parseInt(arg04);
-					    	}
+				    		row = Integer.parseInt(arg03);
+				    		column = Integer.parseInt(arg04);
 							
 							game.attack(arg02, row, column);
 							
@@ -305,10 +312,16 @@ public class BattleServer implements MessageListener
 							return;
 						}
 						
+						else if (!clientsInGame.containsKey(usernameSource))
+						{
+							connectionInterface.sendMessage(
+								"You are not in the current game");
+						}
+						
 						else if (!clientsInGame.containsKey(arg02))
 						{
 							connectionInterface.sendMessage(
-								"No such user has joined this game");
+								"No such user entered this game");
 						}
 						
 						else if (clientsStanding.get(arg02) == null)
@@ -360,6 +373,12 @@ public class BattleServer implements MessageListener
 					{
 						connectionInterface.sendMessage(
 							"Game not in progress");
+					}
+					
+					else if (!clientsInGame.containsKey(usernameSource))
+					{
+						connectionInterface.sendMessage(
+							"You are not in the current game");
 					}
 					
 					else
