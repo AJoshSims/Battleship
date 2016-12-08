@@ -41,5 +41,8 @@ public class BattleDriver
 			command = userInput.nextLine();
 			battleClient.sendCommand(command);
 		}
+		
+		// TODO insert
+//		userInput.close();
 	}
 }
