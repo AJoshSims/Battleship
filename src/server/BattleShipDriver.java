@@ -10,15 +10,17 @@ public class BattleShipDriver
 		int port = Integer.parseInt(args[0]);
 		int boardSize = Integer.parseInt(args[1]);
 		
-		BattleServer battleServer;
+		BattleServer battleServer = null;
 		try
 		{
 			battleServer = new BattleServer(port, boardSize);
-			battleServer.listen();
 		}
 		catch (IOException e)
 		{
-			e.printStackTrace();
+			System.err.println(e.getMessage());
+			System.exit(1);
 		}
+		
+		battleServer.listen();
 	}
 }

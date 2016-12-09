@@ -26,23 +26,23 @@ public class BattleDriver
 		}
 		catch (UnknownHostException e)
 		{
-			e.printStackTrace();
+			System.err.println(e.getMessage());
+			System.exit(1);
 		}
 		catch (IOException e)
 		{
-			e.printStackTrace();
+			System.err.println(e.getMessage());
+			System.exit(1);
 		}
 		
 		Scanner userInput = new Scanner(System.in);
 		String command = "";
-		// TODO forever loop
-		while (true)
+		while (battleClient.isConnected())
 		{
 			command = userInput.nextLine();
 			battleClient.sendCommand(command);
 		}
 		
-		// TODO insert
-//		userInput.close();
+		userInput.close();
 	}
 }

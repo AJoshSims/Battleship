@@ -1,17 +1,11 @@
 package server;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
 
 import common.ConnectionInterface;
-
-//TODO no global variables?
-
 import common.MessageListener;
 import common.MessageSource;
 
@@ -326,8 +320,8 @@ public class BattleServer implements MessageListener
 										else
 										{
 											clientThat.sendMessage(
-												"Game has ended -- " +
-												"a new game may begin");
+												"Game has ended" +
+												"\nA new game may begin");
 										}
 									}
 									
@@ -479,8 +473,8 @@ public class BattleServer implements MessageListener
 								else
 								{
 									clientThat.sendMessage(
-										"Game has ended -- " +
-										"a new game may begin");
+										"Game has ended" +
+										"\nA new game may begin");
 								}
 							}
 							
@@ -544,42 +538,36 @@ public class BattleServer implements MessageListener
 		}
 	}
 	
-	// TODO error handling
-	void listen() throws IOException
+	void listen() 
 	{
 		Socket clientSpecificSocket = null;
-		// TODO no forever loop
-		// while welcomesocket is working?
-		while (true)
+		boolean isAlive = true;
+		while (isAlive == true)
 		{
-			// TODO remove
-			System.out.println("server: before acceptance");
+			try
+			{
+				clientSpecificSocket = welcomeSocket.accept();				
+						
+				ConnectionInterface connectionInterface = 
+					new ConnectionInterface(clientSpecificSocket);
+				connectionInterface.addMessageListener(this);
+						
+				Thread clientThread = new Thread(connectionInterface);
+				clientThread.start();
+			}
 			
-			clientSpecificSocket = welcomeSocket.accept();
-
-			System.out.println("server: after acceptance");
-			
-			PrintWriter socketOutput = 
-				new PrintWriter(clientSpecificSocket.getOutputStream());
-			BufferedReader socketInput = 
-				new BufferedReader(
-				new InputStreamReader(clientSpecificSocket.getInputStream()));
-			
-			System.out.println("server: after createwriter and reader");
-			
-			ConnectionInterface connectionInterface = 
-				new ConnectionInterface(socketOutput, socketInput);
-			
-			System.out.println("server: after create connectionInterface");
-
-			connectionInterface.addMessageListener(this);
-			
-			System.out.println("server: after addMessageListener");
-									
-			Thread clientThread = new Thread(connectionInterface);
-			clientThread.start();
-			
-			System.out.println("server: after connectionInterface thread started");
+			catch (IOException e)
+			{
+				System.err.println(e.getMessage());
+			}
+			catch (SecurityException e)
+			{
+				System.err.println(e.getMessage());
+			}
+			finally
+			{
+				isAlive = false;
+			}
 		}
 	}
 }

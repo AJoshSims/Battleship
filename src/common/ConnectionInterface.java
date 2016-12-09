@@ -2,22 +2,35 @@ package common;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.Socket;
 
 public class ConnectionInterface extends MessageSource implements Runnable
 {
 	private PrintWriter socketOutput;
 
 	private BufferedReader socketInput;
+	
+	private boolean socketAlive;
 		
 	private String username;
 	
-	public ConnectionInterface(
-		PrintWriter socketOutput, BufferedReader socketInput)
+	public ConnectionInterface(Socket clientSpecificSocket) 
+		throws IOException
 	{
-		this.socketOutput = socketOutput;
-		this.socketInput = socketInput;
+		socketOutput = 
+			new PrintWriter(clientSpecificSocket.getOutputStream());
+		socketInput = 
+			new BufferedReader(
+			new InputStreamReader(clientSpecificSocket.getInputStream()));
+		socketAlive = true;
 		username = "";
+	}
+	
+	public boolean isSocketAlive()
+	{
+		return socketAlive;
 	}
 	
 	public String getUsername()
@@ -32,15 +45,12 @@ public class ConnectionInterface extends MessageSource implements Runnable
 	
 	public void run()
 	{
-		// TODO no forever loop
-		// test if socketInputreadline return null would work
-		// also only run while ^ that and while this guy has listeners
-		while (true)
+		while (socketAlive == true)
 		{
 			// TODO error handling
 			String message = "";
 			String messageSegment = "";
-			while (!messageSegment.equals("end"))
+			while ((socketAlive == true) && !messageSegment.equals("end"))
 			{
 				try
 				{			
@@ -49,11 +59,16 @@ public class ConnectionInterface extends MessageSource implements Runnable
 				}
 				catch (IOException e)
 				{
-					// Try again.
+					// Abandons socket, assuming the remote side has closed
+					socketAlive = false;
+					closeMessageSource();
 				}
 			}
 			
-			message = message.substring(0, message.length() - 4);
+			if (socketAlive == true)
+			{
+				message = message.substring(0, message.length() - 4);
+			}
 			
 			notifyReceipt(message);
 		}
@@ -61,7 +76,10 @@ public class ConnectionInterface extends MessageSource implements Runnable
 	
 	public void sendMessage(String message)
 	{
-		socketOutput.print(message + "\nend\n");
-		socketOutput.flush();
+		if (socketAlive == true)
+		{
+			socketOutput.print(message + "\nend\n");
+			socketOutput.flush();			
+		}
 	}
 }

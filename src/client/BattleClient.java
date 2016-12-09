@@ -1,9 +1,6 @@
 package client;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
 
@@ -13,7 +10,7 @@ import common.MessageSource;
 
 // TODO use string builder
 
-public class BattleClient extends MessageSource implements MessageListener
+class BattleClient extends MessageSource implements MessageListener
 {	
 	private ConnectionInterface connectionInterface;
 		
@@ -23,20 +20,19 @@ public class BattleClient extends MessageSource implements MessageListener
 	{					
 		// TODO close socket?
 		Socket clientSpecificSocket = new Socket(host, port);
-		PrintWriter socketOutput = 
-			new PrintWriter(clientSpecificSocket.getOutputStream());
-		BufferedReader socketInput = 
-			new BufferedReader(
-			new InputStreamReader(clientSpecificSocket.getInputStream()));
 		
 		// TODO run connectionInterface as thread for client?
-		connectionInterface = 
-			new ConnectionInterface(socketOutput, socketInput);
+		connectionInterface = new ConnectionInterface(clientSpecificSocket);
 		connectionInterface.addMessageListener(this);
 		Thread thread = new Thread(connectionInterface);
 		thread.start();
 		
 		sendCommand("/join " + username);
+	}
+	
+	boolean isConnected()
+	{
+		return connectionInterface.isSocketAlive();
 	}
 	
 	@Override
