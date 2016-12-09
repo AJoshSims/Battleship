@@ -535,6 +535,8 @@ public class BattleServer implements MessageListener
 			connectionInterface.removeMessageListener(this);
 			
 			clientsJoined.remove(usernameSource);
+			clientsInGame.replace(usernameSource, null);
+			clientsStanding.remove(usernameSource);
 		}
 	}
 	
@@ -546,26 +548,22 @@ public class BattleServer implements MessageListener
 		{
 			try
 			{
+				// TODO remove
+				System.out.println("welcoming...");
+				
 				clientSpecificSocket = welcomeSocket.accept();				
 						
 				ConnectionInterface connectionInterface = 
 					new ConnectionInterface(clientSpecificSocket);
 				connectionInterface.addMessageListener(this);
-						
+
 				Thread clientThread = new Thread(connectionInterface);
 				clientThread.start();
 			}
 			
-			catch (IOException e)
+			catch (IOException | SecurityException e)
 			{
 				System.err.println(e.getMessage());
-			}
-			catch (SecurityException e)
-			{
-				System.err.println(e.getMessage());
-			}
-			finally
-			{
 				isAlive = false;
 			}
 		}

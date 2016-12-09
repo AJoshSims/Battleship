@@ -68,9 +68,9 @@ public class ConnectionInterface extends MessageSource implements Runnable
 			if (socketAlive == true)
 			{
 				message = message.substring(0, message.length() - 4);
+				
+				notifyReceipt(message);
 			}
-			
-			notifyReceipt(message);
 		}
 	}
 	

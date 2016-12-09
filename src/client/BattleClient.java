@@ -13,6 +13,8 @@ import common.MessageSource;
 class BattleClient extends MessageSource implements MessageListener
 {	
 	private ConnectionInterface connectionInterface;
+	
+	private boolean isConnected;
 		
 	// TODO error handling
 	BattleClient(InetAddress host, int port, String username)
@@ -26,13 +28,14 @@ class BattleClient extends MessageSource implements MessageListener
 		connectionInterface.addMessageListener(this);
 		Thread thread = new Thread(connectionInterface);
 		thread.start();
+		isConnected = true;
 		
 		sendCommand("/join " + username);
 	}
 	
 	boolean isConnected()
 	{
-		return connectionInterface.isSocketAlive();
+		return isConnected;
 	}
 	
 	@Override
@@ -45,7 +48,8 @@ class BattleClient extends MessageSource implements MessageListener
 	@Override
 	public void sourceClosed(MessageSource source)
 	{
-		
+		source.removeMessageListener(this);
+		isConnected = false;
 	}
 	
 	void sendCommand(String message)
