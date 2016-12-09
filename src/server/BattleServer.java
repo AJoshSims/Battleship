@@ -702,7 +702,9 @@ class BattleServer implements MessageListener
 				return;
 			}
 			
-			if (usernameSource.equals(clientsStanding[actingClient]))
+			if (
+				(clientsStanding != null) 
+				&& usernameSource.equals(clientsStanding[actingClient]))
 			{				
 				++actingClient;
 				if (actingClient >= clientsStandingMax)
