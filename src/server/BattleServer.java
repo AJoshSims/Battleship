@@ -21,14 +21,23 @@ public class BattleServer implements MessageListener
 	
 	private HashMap<String, ConnectionInterface> clientsInGame;
 	
-	private HashMap<String, ConnectionInterface> clientsStanding;
+	private String[] clientsStanding;
+	
+	private int clientsStandingMax;
+	
+	private int clientsStandingActual;
+	
+	private int actingClient;
 		
 	// TODO error handling
 	BattleServer(int port, int boardSize) throws IOException
 	{
 		clientsJoined = new HashMap<String, ConnectionInterface>();
 		clientsInGame = new HashMap<String, ConnectionInterface>();
-		clientsStanding = new HashMap<String, ConnectionInterface>();
+		clientsStanding = null;
+		clientsStandingMax = -1;
+		clientsStandingActual = -1;
+		actingClient = -1;
 		this.boardSize = boardSize;
 		game = null;
 		welcomeSocket = new ServerSocket(port);
@@ -203,15 +212,23 @@ public class BattleServer implements MessageListener
 					
 					else
 					{
+						clientsStandingActual = 
+							clientsStandingMax = 
+							clientsJoined.size();
+						clientsStanding = new String[clientsStandingMax];
+						clientsJoined.keySet().toArray(clientsStanding);
+						actingClient = 0;
 						game = new Game();
-						for (String username : clientsJoined.keySet())
+						for (String username : clientsStanding)
 						{	
 							game.addGrid(username, boardSize);
 							clientsInGame.put(username, clientsJoined.get(username));
-							clientsStanding.put(username, clientsJoined.get(username));
 
 							clientThat = clientsInGame.get(username);
-							clientThat.sendMessage("The game begins");
+							clientThat.sendMessage(
+								"The game begins" +
+								"\n" + clientsStanding[actingClient] + 
+								" it is your turn");
 						}
 					}
 					break;
@@ -273,7 +290,7 @@ public class BattleServer implements MessageListener
 								"No such user entered this game");
 						}
 						
-						else if (clientsStanding.get(arg02) == null)
+						else if (!clientStandingExists(arg02))
 						{
 							connectionInterface.sendMessage(
 								"That user has already been eliminated");
@@ -297,16 +314,28 @@ public class BattleServer implements MessageListener
 								messageBroadcast += 
 									"\n!!! All ships belonging to " + arg02 + 
 									" have been destroyed";
-								clientsStanding.remove(arg02);
+								--clientsStandingActual;
 								
-								if (clientsStanding.size() == 1)
+								if (clientsStandingActual == 1)
 								{
-									// TODO switch turn message before win?
+									String winner = null;
+									while (
+										(winner = clientsStanding[actingClient])
+										== null)
+									{
+										++actingClient;
+										if (actingClient >= clientsStandingMax)
+										{
+											actingClient = 0;
+										}
+									}
+									
 									game = null;
 									messageBroadcast += "\nGAME OVER: " + 
-										clientsStanding.keySet().toArray()[0] +
-										" wins!";
-									clientsStanding.clear();
+										winner + " wins!";
+									clientsStanding = null;
+									clientsStandingActual = -1;
+									clientsStandingMax = -1;
 									
 									for (String username : clientsJoined.keySet())
 									{
@@ -329,6 +358,23 @@ public class BattleServer implements MessageListener
 									break;
 								}
 							}
+							
+							++actingClient;
+							if (actingClient >= clientsStandingMax)
+							{
+								actingClient = 0;
+							}
+							while (clientsStanding[actingClient] == null)
+							{
+								++actingClient;
+								if (actingClient >= clientsStandingMax)
+								{
+									actingClient = 0;
+								}
+							}
+							messageBroadcast += 
+								"\n" + clientsStanding[actingClient] + 
+								" it is your turn";
 							
 							for (String username : clientsInGame.keySet())
 							{
@@ -375,7 +421,7 @@ public class BattleServer implements MessageListener
 								"No such user entered this game");
 						}
 						
-						else if (clientsStanding.get(arg02) == null)
+						else if (!clientStandingExists(arg02))
 						{
 							connectionInterface.sendMessage(
 								"That user has already been eliminated");
@@ -446,20 +492,33 @@ public class BattleServer implements MessageListener
 					
 					else
 					{
-						clientsStanding.remove(usernameSource);
+						--clientsStandingActual;
 						clientsInGame.replace(usernameSource, null);
 						
 						messageBroadcast = 
 							"!!! " + usernameSource + " surrendered";
 						
-						if (clientsStanding.size() == 1)
+						if (clientsStandingActual == 1)
 						{
-							// TODO switch turn message before win?
 							game = null;
-							messageBroadcast += "\nGAME OVER: " + 
-								clientsStanding.keySet().toArray()[0] +
+
+							String winner = null;
+							while (
+								(winner = clientsStanding[actingClient])
+								== null)
+							{
+								++actingClient;
+								if (actingClient >= clientsStandingMax)
+								{
+									actingClient = 0;
+								}
+							}
+							
+							messageBroadcast += "\nGAME OVER: " + winner + 
 								" wins!";
-							clientsStanding.clear();
+							clientsStanding = null;
+							clientsStandingActual = -1;
+							clientsStandingMax = -1;
 							
 							for (String username : clientsJoined.keySet())
 							{
@@ -481,6 +540,23 @@ public class BattleServer implements MessageListener
 							clientsInGame.clear();
 							break;
 						}
+						
+						++actingClient;
+						if (actingClient >= clientsStandingMax)
+						{
+							actingClient = 0;
+						}
+						while (clientsStanding[actingClient] == null)
+						{
+							++actingClient;
+							if (actingClient >= clientsStandingMax)
+							{
+								actingClient = 0;
+							}
+						}
+						messageBroadcast += 
+							"\n" + clientsStanding[actingClient] + 
+							" it is your turn";
 						
 						for (String username : clientsInGame.keySet())
 						{
@@ -522,6 +598,36 @@ public class BattleServer implements MessageListener
 				"Invalid command: " + message);
 		}		
 	}
+	
+	private boolean clientStandingExists(String username)
+	{
+		for (
+			int usernameIndex = 0;
+			usernameIndex < clientsStanding.length;
+			++usernameIndex)
+		{
+			if (clientsStanding[usernameIndex] == username)
+			{
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	private void removeClientStanding(String username)
+	{
+		for (
+			int usernameIndex = 0;
+			usernameIndex < clientsStanding.length;
+			++usernameIndex)
+		{
+			if (clientsStanding[usernameIndex] == username)
+			{
+				clientsStanding[usernameIndex] = null;
+			}
+		}
+	}
 
 	@Override
 	public void sourceClosed(MessageSource source)
@@ -535,14 +641,14 @@ public class BattleServer implements MessageListener
 			connectionInterface.removeMessageListener(this);
 			
 			clientsJoined.remove(usernameSource);
-			clientsStanding.remove(usernameSource);
+			removeClientStanding(usernameSource);
 			clientsInGame.replace(usernameSource, null);
 			
 			String 	messageBroadcast = 
 				"!!! " + usernameSource + " surrendered";
 			
 			ConnectionInterface clientThat = null;
-			if (clientsStanding.size() == 1)
+			if (clientsStandingActual == 1)
 			{
 				game = null;
 				messageBroadcast += "\nGAME OVER: " + 
@@ -590,9 +696,6 @@ public class BattleServer implements MessageListener
 		{
 			try
 			{
-				// TODO remove
-				System.out.println("welcoming...");
-				
 				clientSpecificSocket = welcomeSocket.accept();				
 						
 				ConnectionInterface connectionInterface = 
