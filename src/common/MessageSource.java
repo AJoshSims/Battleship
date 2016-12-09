@@ -21,7 +21,8 @@ public abstract class MessageSource
 	private List<MessageListener> messageListeners;
 
 	/**
-	 * Constructs a new <code>MessageSource</code> with no registered observers.
+	 * Constructs a new <code>MessageSource</code> with no registered 
+	 * observers.
 	 */
 	public MessageSource() 
 	{
@@ -49,14 +50,16 @@ public abstract class MessageSource
 	}
 	
    /**
-	* Notifies <b>all</b> registered observers that this message source will generate no new
-	* messages.
+	* Notifies <b>all</b> registered observers that this message source will 
+	* generate no new messages.
 	*/
 	protected void closeMessageSource() {
 		/*
-		* Here we need to iterate over a *copy* of our messageListeners list. The reason is
-		* because if the listener’s ’sourceClosed’ method removes that listener from this subject,
-		* we’d get a ConcurrentModificationException if we were iterating over the original list.
+		* Here we need to iterate over a *copy* of our messageListeners list. 
+		* The reason is because if the listener’s ’sourceClosed’ method 
+		* removes that listener from this subject, we’d get a 
+		* ConcurrentModificationException if we were iterating over the 
+		* original list.
 		*/
 		for (
 			MessageListener listener 
@@ -69,8 +72,9 @@ public abstract class MessageSource
 			catch (RuntimeException ex) 
 			{
 				/*
-				* We’re doing this on a best-effort basis. If something goes wrong, we don’t want
-				* to stop. Here, we simply dump the stack and continue.
+				* We’re doing this on a best-effort basis. If something goes 
+				* wrong, we don’t want to stop. Here, we simply dump the stack 
+				* and continue.
 				*/
 				ex.printStackTrace();
 			}
@@ -79,7 +83,8 @@ public abstract class MessageSource
 	}
 	
    /**
-	* Notifies <b>all</b> registered listeners that a new message has been received.
+	* Notifies <b>all</b> registered listeners that a new message has been 
+	* received.
 	*
 	* @param message The message this subject received.
 	*/
@@ -90,8 +95,9 @@ public abstract class MessageSource
 			: new ArrayList<MessageListener>(messageListeners)) 
 		{
 			/*
-			* We wrap this in a try/catch block so that just in case one of our observers screws
-			* up, we don’t want to stop notifying other observers.
+			* We wrap this in a try/catch block so that just in case one of 
+			* our observers screws up, we don’t want to stop notifying other 
+			* observers.
 			*/
 			try 
 			{
@@ -100,8 +106,9 @@ public abstract class MessageSource
 			catch (RuntimeException ex) 
 			{
 				/*
-				* We’re doing this on a best-effort basis. If something goes wrong, we don’t want
-				* to stop. Here, we simply dump the stack and continue.
+				* We’re doing this on a best-effort basis. If something goes 
+				* wrong, we don’t want to stop. Here, we simply dump the stack 
+				* and continue.
 				*/
 				ex.printStackTrace();
 			}

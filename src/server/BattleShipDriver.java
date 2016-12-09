@@ -2,7 +2,14 @@ package server;
 
 import java.io.IOException;
 
-public class BattleShipDriver
+/**
+ * 
+ * 
+ * @author Evan Arroy
+ * @author Joshua Sims
+ * @version 09 December 2016
+ */
+final class BattleShipDriver
 {	
 	public static void main(String[] args)
 	{		

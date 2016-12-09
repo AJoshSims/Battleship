@@ -7,7 +7,14 @@ import java.util.Scanner;
 
 // TODO close things
 
-public class BattleDriver
+/**
+ * 
+ * 
+ * @author Evan Arroy
+ * @author Joshua Sims
+ * @version 09 December 2016
+ */
+final class BattleDriver
 {
 	public static void main(String[] args)
 	{

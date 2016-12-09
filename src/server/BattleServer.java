@@ -9,7 +9,14 @@ import common.ConnectionInterface;
 import common.MessageListener;
 import common.MessageSource;
 
-public class BattleServer implements MessageListener
+/**
+ * 
+ * 
+ * @author Evan Arroy
+ * @author Joshua Sims
+ * @version 09 December 2016
+ */
+class BattleServer implements MessageListener
 {		
 	private final int boardSize;
 	

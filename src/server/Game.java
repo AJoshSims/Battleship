@@ -2,6 +2,13 @@ package server;
 
 import java.util.HashMap;
 
+/**
+ * 
+ * 
+ * @author Evan Arroy
+ * @author Joshua Sims
+ * @version 09 December 2016
+ */
 class Game 
 {
 	private static HashMap<String, Grid> grids;

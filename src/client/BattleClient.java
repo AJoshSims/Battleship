@@ -10,6 +10,13 @@ import common.MessageSource;
 
 // TODO use string builder
 
+/**
+ * 
+ * 
+ * @author Evan Arroy
+ * @author Joshua Sims
+ * @version 09 December 2016
+ */
 class BattleClient extends MessageSource implements MessageListener
 {	
 	private ConnectionInterface connectionInterface;

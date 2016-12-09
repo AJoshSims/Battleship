@@ -1,7 +1,8 @@
 package common;
 
 /**
-* This interface represents &quot;observers&quot; of <code>MessageSource</code>s.
+* This interface represents &quot;observers&quot; of 
+* <code>MessageSource</code>s.
 *
 * @author Dr. William Kreahling
 * @version October 2016
@@ -17,10 +18,11 @@ public interface MessageListener
 	public void messageReceived(String message, MessageSource source);
 	
 	/**
-	* Used to notify observers that the subject will not receive new messages; observers can
-	* deregister themselves.
+	* Used to notify observers that the subject will not receive new messages; 
+	* observers can deregister themselves.
 	*
-	* @param source The <code>MessageSource</code> that does not expect more messages.
+	* @param source The <code>MessageSource</code> that does not expect more 
+	*     messages.
 	*/
 	public void sourceClosed(MessageSource source);
 }

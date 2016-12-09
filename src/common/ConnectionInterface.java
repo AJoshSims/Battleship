@@ -6,6 +6,13 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
+/**
+ * 
+ * 
+ * @author Evan Arroy
+ * @author Joshua Sims
+ * @version 09 December 2016
+ */
 public class ConnectionInterface extends MessageSource implements Runnable
 {
 	private PrintWriter socketOutput;

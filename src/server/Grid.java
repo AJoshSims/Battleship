@@ -2,11 +2,18 @@ package server;
 
 import java.util.Arrays;
 
-import utilities.Constants;
+import utilities.CommonConstants;
 import utilities.MutableInteger;
 
 // TODO make boardSize static
 
+/**
+ * 
+ * 
+ * @author Evan Arroy
+ * @author Joshua Sims
+ * @version 09 December 2016
+ */
 class Grid
 {
 	private final int boardSize;
@@ -129,10 +136,10 @@ class Grid
 		final int minEdge = 0;
 		final int requiredDistanceFromEdge = shipLength - 1;
 
-		row.value = Constants.RANDOM_VAL_GENERATOR.nextInt(boardSize);
-		column.value = Constants.RANDOM_VAL_GENERATOR.nextInt(boardSize);
+		row.value = CommonConstants.RANDOM_VAL_GENERATOR.nextInt(boardSize);
+		column.value = CommonConstants.RANDOM_VAL_GENERATOR.nextInt(boardSize);
 		
-		boolean buildAlongRow = Constants.RANDOM_VAL_GENERATOR.nextBoolean();
+		boolean buildAlongRow = CommonConstants.RANDOM_VAL_GENERATOR.nextBoolean();
 		
 		if (buildAlongRow == true)
 		{
