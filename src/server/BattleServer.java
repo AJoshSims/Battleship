@@ -218,10 +218,10 @@ public class BattleServer implements MessageListener
 						clientsStanding = new String[clientsStandingMax];
 						clientsJoined.keySet().toArray(clientsStanding);
 						actingClient = 0;
-						game = new Game();
+						game = new Game(boardSize);
 						for (String username : clientsStanding)
 						{	
-							game.addGrid(username, boardSize);
+							game.addGrid(username);
 							clientsInGame.put(username, clientsJoined.get(username));
 
 							clientThat = clientsInGame.get(username);
@@ -253,12 +253,25 @@ public class BattleServer implements MessageListener
 				    			invalidCommand = true;
 				    		}
 				    	}
+				    	
 				    	for (char character : maybeColumn)
 				    	{
 				    		if (!Character.isDigit(character))
 				    		{
 				    			invalidCommand = true;
 				    		}
+				    	}
+				    	
+				    	if (invalidCommand == false)
+				    	{
+				    		row = Integer.parseInt(arg03);
+				    		column = Integer.parseInt(arg04);
+				    		
+					    	if ((row < 0) || (row >= boardSize) 
+					    		|| (column < 0) || (column >= boardSize))
+					    	{
+					    		invalidCommand = true;
+					    	}
 				    	}
 				    	
 				    	if (invalidCommand == true)
@@ -299,11 +312,9 @@ public class BattleServer implements MessageListener
 								"That user has already been eliminated");
 						}
 						
-						else
-						{
-				    		row = Integer.parseInt(arg03);
-				    		column = Integer.parseInt(arg04);
-							
+						else if (usernameSource.equals(
+							clientsStanding[actingClient]))
+						{	
 							game.attack(arg02, row, column);
 							
 							messageBroadcast = 
@@ -389,7 +400,15 @@ public class BattleServer implements MessageListener
 								}
 							}
 						}
+				    	
+						else
+						{
+							connectionInterface.sendMessage(
+								"Move Failed, player turn: " + 
+								clientsStanding[actingClient]);
+						}
 					}
+					
 					break;
 					
 				case "/show":
@@ -546,22 +565,26 @@ public class BattleServer implements MessageListener
 							break;
 						}
 						
-						++actingClient;
-						if (actingClient >= clientsStandingMax)
-						{
-							actingClient = 0;
-						}
-						while (clientsStanding[actingClient] == null)
+						if (usernameSource.equals(
+							clientsStanding[actingClient]))
 						{
 							++actingClient;
 							if (actingClient >= clientsStandingMax)
 							{
 								actingClient = 0;
 							}
+							while (clientsStanding[actingClient] == null)
+							{
+								++actingClient;
+								if (actingClient >= clientsStandingMax)
+								{
+									actingClient = 0;
+								}
+							}
+							messageBroadcast += 
+								"\n" + clientsStanding[actingClient] + 
+								" it is your turn";
 						}
-						messageBroadcast += 
-							"\n" + clientsStanding[actingClient] + 
-							" it is your turn";
 						
 						for (String username : clientsInGame.keySet())
 						{
@@ -672,22 +695,25 @@ public class BattleServer implements MessageListener
 				return;
 			}
 			
-			++actingClient;
-			if (actingClient >= clientsStandingMax)
-			{
-				actingClient = 0;
-			}
-			while (clientsStanding[actingClient] == null)
-			{
+			if (usernameSource.equals(clientsStanding[actingClient]))
+			{				
 				++actingClient;
 				if (actingClient >= clientsStandingMax)
 				{
 					actingClient = 0;
 				}
+				while (clientsStanding[actingClient] == null)
+				{
+					++actingClient;
+					if (actingClient >= clientsStandingMax)
+					{
+						actingClient = 0;
+					}
+				}
+				messageBroadcast += 
+								"\n" + clientsStanding[actingClient] + 
+								" it is your turn";
 			}
-			messageBroadcast += 
-				"\n" + clientsStanding[actingClient] + 
-				" it is your turn";
 			
 			for (String username : clientsInGame.keySet())
 			{
@@ -725,7 +751,9 @@ public class BattleServer implements MessageListener
 				usernameIndex < clientsStanding.length;
 				++usernameIndex)
 			{
-				if (clientsStanding[usernameIndex].equals(username))
+				if (
+					(clientsStanding[usernameIndex] != null) 
+					&& (clientsStanding[usernameIndex].equals(username)))
 				{
 					return usernameIndex;
 				}

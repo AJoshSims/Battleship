@@ -6,8 +6,12 @@ class Game
 {
 	private static HashMap<String, Grid> grids;
 	
-	Game()
+	private final int boardSize;
+	
+	Game(int boardSize)
 	{
+		// TODO error handling here
+		this.boardSize = boardSize;
 		grids = new HashMap<String, Grid>();
 	}
 	
@@ -16,7 +20,7 @@ class Game
 		return grids.get(username);
 	}
 	
-	void addGrid(String username, int boardSize)
+	void addGrid(String username)
 	{
 		grids.put(username, new Grid(username, boardSize));
 	}
