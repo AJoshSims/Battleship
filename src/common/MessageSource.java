@@ -56,8 +56,8 @@ public abstract class MessageSource
 	protected void closeMessageSource() {
 		/*
 		* Here we need to iterate over a *copy* of our messageListeners list. 
-		* The reason is because if the listener’s ’sourceClosed’ method 
-		* removes that listener from this subject, we’d get a 
+		* The reason is because if the listener's 'sourceClosed' method 
+		* removes that listener from this subject, we'd get a 
 		* ConcurrentModificationException if we were iterating over the 
 		* original list.
 		*/
@@ -72,8 +72,8 @@ public abstract class MessageSource
 			catch (RuntimeException ex) 
 			{
 				/*
-				* We’re doing this on a best-effort basis. If something goes 
-				* wrong, we don’t want to stop. Here, we simply dump the stack 
+				* We're doing this on a best-effort basis. If something goes 
+				* wrong, we don't want to stop. Here, we simply dump the stack 
 				* and continue.
 				*/
 				ex.printStackTrace();
@@ -96,7 +96,7 @@ public abstract class MessageSource
 		{
 			/*
 			* We wrap this in a try/catch block so that just in case one of 
-			* our observers screws up, we don’t want to stop notifying other 
+			* our observers screws up, we don't want to stop notifying other 
 			* observers.
 			*/
 			try 
@@ -106,8 +106,8 @@ public abstract class MessageSource
 			catch (RuntimeException ex) 
 			{
 				/*
-				* We’re doing this on a best-effort basis. If something goes 
-				* wrong, we don’t want to stop. Here, we simply dump the stack 
+				* We're doing this on a best-effort basis. If something goes 
+				* wrong, we don't want to stop. Here, we simply dump the stack 
 				* and continue.
 				*/
 				ex.printStackTrace();
