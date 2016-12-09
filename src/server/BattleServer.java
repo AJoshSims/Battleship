@@ -535,8 +535,50 @@ public class BattleServer implements MessageListener
 			connectionInterface.removeMessageListener(this);
 			
 			clientsJoined.remove(usernameSource);
-			clientsInGame.replace(usernameSource, null);
 			clientsStanding.remove(usernameSource);
+			clientsInGame.replace(usernameSource, null);
+			
+			String 	messageBroadcast = 
+				"!!! " + usernameSource + " surrendered";
+			
+			ConnectionInterface clientThat = null;
+			if (clientsStanding.size() == 1)
+			{
+				game = null;
+				messageBroadcast += "\nGAME OVER: " + 
+					clientsStanding.keySet().toArray()[0] +
+					" wins!";
+				clientsStanding.clear();
+				
+				for (String username : clientsJoined.keySet())
+				{
+					clientThat = clientsJoined.get(username);
+					
+					if (clientsInGame.get(username) != null)
+					{								
+						clientThat.sendMessage(messageBroadcast);
+					}
+					
+					else
+					{
+						clientThat.sendMessage(
+							"Game has ended" +
+							"\nA new game may begin");
+					}
+				}
+				
+				clientsInGame.clear();
+				return;
+			}
+			
+			for (String username : clientsInGame.keySet())
+			{
+				clientThat = clientsInGame.get(username);
+				if (clientThat != null)
+				{
+					clientThat.sendMessage(messageBroadcast);
+				}
+			}
 		}
 	}
 	
