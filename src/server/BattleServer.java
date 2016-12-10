@@ -36,7 +36,6 @@ class BattleServer implements MessageListener
 	
 	private int actingClient;
 		
-	// TODO error handling
 	BattleServer(int port, int boardSize) throws IOException
 	{
 		clientsJoined = new HashMap<String, ConnectionInterface>();
@@ -45,16 +44,17 @@ class BattleServer implements MessageListener
 		clientsStandingMax = -1;
 		clientsStandingActual = -1;
 		actingClient = -1;
+		
 		this.boardSize = boardSize;
+		
 		game = null;
+		
 		welcomeSocket = new ServerSocket(port);
 	}
 	
-	// TODO string builder
 	@Override
 	public void messageReceived(String message, MessageSource source)
 	{
-		// TODO change
 		if (!(source instanceof ConnectionInterface))
 		{
 			return;
@@ -67,9 +67,6 @@ class BattleServer implements MessageListener
 					
 		String[] messageSegments = message.split(" ");
 		
-		// TODO game in progress
-		// TODO mag num
-		// TODO error handling
 		boolean invalidCommand = false;
 		
 		String arg04 = null;
@@ -148,7 +145,6 @@ class BattleServer implements MessageListener
 				invalidCommand = true;
 		}
 		
-		// TODO robust error handling for invalid commands
 		String messageBroadcast = null;
 		ConnectionInterface clientThat = null;
 		
@@ -198,7 +194,6 @@ class BattleServer implements MessageListener
 						invalidCommand = true;
 					}
 
-					// TODO user has to be joined to execute commands?
 					else if (usernameSource.equals(""))
 					{
 						connectionInterface.sendMessage(
@@ -283,7 +278,6 @@ class BattleServer implements MessageListener
 				    	
 				    	if (invalidCommand == true)
 				    	{
-				    		// TODO or do nothing
 				    		break;
 				    	}
 						
@@ -495,7 +489,6 @@ class BattleServer implements MessageListener
 					}
 					break;
 					
-					//TODO handle client side of quit
 				case "/quit":
 					if (arg02 != null)
 					{
