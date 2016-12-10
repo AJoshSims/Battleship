@@ -10,7 +10,7 @@ import utilities.MutableInteger;
 /**
  * 
  * 
- * @author Evan Arroy
+ * @author Evan Arroyo
  * @author Joshua Sims
  * @version 09 December 2016
  */

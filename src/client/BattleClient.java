@@ -13,7 +13,7 @@ import common.MessageSource;
 /**
  * 
  * 
- * @author Evan Arroy
+ * @author Evan Arroyo
  * @author Joshua Sims
  * @version 09 December 2016
  */
@@ -23,14 +23,11 @@ class BattleClient extends MessageSource implements MessageListener
 	
 	private boolean isConnected;
 		
-	// TODO error handling
 	BattleClient(InetAddress host, int port, String username)
 		throws IOException
 	{					
-		// TODO close socket?
 		Socket clientSpecificSocket = new Socket(host, port);
 		
-		// TODO run connectionInterface as thread for client?
 		connectionInterface = new ConnectionInterface(clientSpecificSocket);
 		connectionInterface.addMessageListener(this);
 		Thread thread = new Thread(connectionInterface);
