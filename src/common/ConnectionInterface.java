@@ -54,7 +54,6 @@ public class ConnectionInterface extends MessageSource implements Runnable
 	{
 		while (socketAlive == true)
 		{
-			// TODO error handling
 			String message = "";
 			String messageSegment = "";
 			while ((socketAlive == true) && !messageSegment.equals("end"))

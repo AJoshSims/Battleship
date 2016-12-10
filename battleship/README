@@ -1,0 +1,9 @@
+To place only a submarine and a destroyer on each grid 
+(for easier win conditions of the battleship game)
+	1. Navigate to the file named Grid.java
+		(The file path is <wherever>/battleship/src/server/Grid.java)
+	2. Search through the source code therein for the expression "remainingShipSegments = placeShipsFew();"
+		(It is located within the 
+		Grid(String username, int boardSize) constructor)
+	3. Replace that expression with "remainingShipSegments = placeShips();"
+	4. Run the program like usual.

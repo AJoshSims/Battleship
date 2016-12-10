@@ -17,7 +17,6 @@ class Game
 	
 	Game(int boardSize)
 	{
-		// TODO error handling here
 		this.boardSize = boardSize;
 		grids = new HashMap<String, Grid>();
 	}

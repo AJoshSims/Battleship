@@ -32,7 +32,7 @@ final class BattleDriver
 	
 	private static final int USERNAME_INDEX = 2;
 	
-	public static void main(String[] cmdLineArgs)
+	public static final void main(String[] cmdLineArgs)
 	{	
 		try (Scanner userInput = new Scanner(System.in))
 		{
@@ -80,7 +80,7 @@ final class BattleDriver
 		}
 	}
 	
-	private static Object[] parseCmdLineArgs(String[] cmdLineArgs)
+	private static final Object[] parseCmdLineArgs(String[] cmdLineArgs)
 		throws 
 		InvalidNumOfCmdLineArgsException,
 		UnknownHostException,

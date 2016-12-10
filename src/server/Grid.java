@@ -5,8 +5,6 @@ import java.util.Arrays;
 import utilities.CommonConstants;
 import utilities.MutableInteger;
 
-// TODO make boardSize static
-
 /**
  * 
  * 
@@ -30,7 +28,9 @@ class Grid
 		board = new Tile[boardSize][boardSize];
 		this.username = username;
 		createBoard();
-		// TODO change to placeShips
+		
+		// If you want more than just a submarine and a destroyer on each grid
+		// then change this to remainingShipSegments = placeShips(); 
 		remainingShipSegments = placeShipsFew();
 	}
 	
@@ -92,7 +92,6 @@ class Grid
 		return shipSegmentsPlaced;
 	}
 	
-	// TODO overload placeships instead?
 	private int placeShipsFew()
 	{
 		int shipSegmentsPlaced = 0;

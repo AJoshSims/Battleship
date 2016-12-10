@@ -8,8 +8,6 @@ import common.ConnectionInterface;
 import common.MessageListener;
 import common.MessageSource;
 
-// TODO use string builder
-
 /**
  * 
  * 
